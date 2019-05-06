@@ -39,7 +39,7 @@ public class Board extends JComponent implements KeyListener{
 					repaint();
 					shiftDir(snake);
 					collisionHB(snake, snake);
-					collisionSA(snake, apple);
+					collisionHA(snake, apple);
 					snake.moveCount = 0;
 				}
 				else
@@ -122,7 +122,16 @@ public class Board extends JComponent implements KeyListener{
 		}
 	}
 	
-	private void collisionSA(Snake s, Apple a) {
+	private boolean collisionSA(Snake s, Apple a){
+		for(int i = 0;i < s.maxLength;i++) {
+			if((a.x==s.body.get(i).x)&&(a.y==s.body.get(i).y)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void collisionHA(Snake s, Apple a) {
 		if((s.body.get(0).x==a.x)&&(s.body.get(0).y==a.y)) {
 			s.body.add(new Part());
 			s.maxLength++;
@@ -136,8 +145,13 @@ public class Board extends JComponent implements KeyListener{
 			s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
 			s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
 			s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
-			a.x = random.nextInt(49);
-			a.y = random.nextInt(49);
+			while(true){
+				a.x = random.nextInt(49);
+				a.y = random.nextInt(49);
+				if(!collisionSA(snake, apple)){
+					break;
+				}
+			}
 			if(s.maxLength > 10)
 			{
 				s.updateLevel();
