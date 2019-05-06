@@ -28,9 +28,9 @@ public class Board extends JComponent implements KeyListener{
 		try {
 			while(true) {
 				Thread.sleep(50);
-				move();
+				move(snake);
 				repaint();
-				shiftDir();
+				shiftDir(snake);
 				collisionHB(snake, snake);
 				collisionSA(snake, apple);
 			}
@@ -47,7 +47,7 @@ public class Board extends JComponent implements KeyListener{
 		g.drawRect(apple.x*grid, apple.y*grid, grid , grid);
 	}
 	
-	private void shiftDir() {
+	private void shiftDir(Snake snake) {
 		for(int i = (snake.maxLength-1);i > 0;i--) {
 			if(snake.body.get(i).dx != snake.body.get(i-1).dx) {
 				snake.body.get(i).dx = snake.body.get(i-1).dx;
@@ -58,7 +58,7 @@ public class Board extends JComponent implements KeyListener{
 		}
 	}
 	
-	private void move() {
+	private void move(Snake snake) {
 		for(int i = 0;i < snake.maxLength;i++) {
 			snake.body.get(i).x += snake.body.get(i).dx;
 			if(snake.body.get(i).x > (weight/grid)) {
