@@ -1,8 +1,12 @@
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+
+import org.w3c.dom.events.Event;
+
 import java.util.Random;
 
 public class Board extends JComponent implements KeyListener{
@@ -12,11 +16,12 @@ public class Board extends JComponent implements KeyListener{
 	private Apple apple = new Apple(20, 20);
 	private Random random = new Random();
 	public int grid = 16;
+	public boolean keysPressed = false;
 	
 	public void init () {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setBounds(0,0,weight,height);
+		frame.setBounds(0,0,weight+(grid/2),height+(grid*2));
 		
 		frame.getContentPane().add(this);
 		frame.addKeyListener(this);
@@ -27,12 +32,21 @@ public class Board extends JComponent implements KeyListener{
 		
 		try {
 			while(true) {
+				keysPressed = false;
 				Thread.sleep(50);
-				move(snake);
-				repaint();
-				shiftDir(snake);
-				collisionHB(snake, snake);
-				collisionSA(snake, apple);
+				if(snake.moveCount == 2 - snake.level)
+				{
+					move(snake);
+					repaint();
+					shiftDir(snake);
+					collisionHB(snake, snake);
+					collisionSA(snake, apple);
+					snake.moveCount = 0;
+				}
+				else
+				{
+					snake.moveCount++;
+				}
 			}
 		}
 		catch(InterruptedException e){
@@ -41,10 +55,15 @@ public class Board extends JComponent implements KeyListener{
 	}
 	
 	public void paint (Graphics g) {
+		g.setColor(Color.black);
 		for(int i = 0;i < snake.maxLength;i++) {
 			g.drawRect(snake.body.get(i).x*grid, snake.body.get(i).y*grid, grid , grid);
+			g.fillRect(snake.body.get(i).x*grid, snake.body.get(i).y*grid, grid , grid);
 		}
+		
+		g.setColor(Color.red);
 		g.drawRect(apple.x*grid, apple.y*grid, grid , grid);
+		g.fillRect(apple.x*grid, apple.y*grid, grid , grid);
 	}
 	
 	private void shiftDir(Snake snake) {
@@ -61,18 +80,18 @@ public class Board extends JComponent implements KeyListener{
 	private void move(Snake snake) {
 		for(int i = 0;i < snake.maxLength;i++) {
 			snake.body.get(i).x += snake.body.get(i).dx;
-			if(snake.body.get(i).x > (weight/grid)) {
+			if(snake.body.get(i).x > (weight/grid) - 1) {
 				snake.body.get(i).x = 0;
 			}
 			else if(snake.body.get(i).x < 0) {
-				snake.body.get(i).x = (weight/grid);
+				snake.body.get(i).x = (weight/grid) - 1;
 			}
 			snake.body.get(i).y += snake.body.get(i).dy;
-			if(snake.body.get(i).y > (height/grid)) {
+			if(snake.body.get(i).y > (height/grid) - 1) {
 				snake.body.get(i).y = 0;
 			}
 			else if(snake.body.get(i).y < 0) {
-				snake.body.get(i).y = (height/grid);
+				snake.body.get(i).y = (height/grid) - 1;
 			}
 		}
 	}
@@ -118,45 +137,49 @@ public class Board extends JComponent implements KeyListener{
 			s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
 			s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
 			s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
-			a.x = random.nextInt(50);
-			a.y = random.nextInt(50);
+			a.x = random.nextInt(49);
+			a.y = random.nextInt(49);
 		}
 	}
 	
 	public void keyReleased(KeyEvent e) {}
 	public void keyTyped(KeyEvent e) {}
 	public void keyPressed(KeyEvent e) {
-		if((e.getKeyCode()==KeyEvent.VK_RIGHT)&&(!snake.body.get(0).left)) {
+		if(!keysPressed)
+		{
+			if((e.getKeyCode()==KeyEvent.VK_RIGHT)&&(!snake.body.get(0).left)) {
 			snake.body.get(0).dx = 1;
 			snake.body.get(0).dy = 0;
 			snake.body.get(0).right = true;
 			snake.body.get(0).left = false;
 			snake.body.get(0).down = false;
 			snake.body.get(0).up = false;
-		}
-		else if((e.getKeyCode()==KeyEvent.VK_LEFT)&&(!snake.body.get(0).right)) {
-			snake.body.get(0).dx = -1;
-			snake.body.get(0).dy = 0;
-			snake.body.get(0).right = false;
-			snake.body.get(0).left = true;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = false;
-		}
-		else if((e.getKeyCode()==KeyEvent.VK_DOWN)&&(!snake.body.get(0).up)) {
-			snake.body.get(0).dx = 0;
-			snake.body.get(0).dy = 1;
-			snake.body.get(0).right = false;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = true;
-			snake.body.get(0).up = false;
-		}
-		else if((e.getKeyCode()==KeyEvent.VK_UP)&&(!snake.body.get(0).down)) {
-			snake.body.get(0).dx = 0;
-			snake.body.get(0).dy = -1;
-			snake.body.get(0).right = false;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = true;
+			}
+			else if((e.getKeyCode()==KeyEvent.VK_LEFT)&&(!snake.body.get(0).right)) {
+				snake.body.get(0).dx = -1;
+				snake.body.get(0).dy = 0;
+				snake.body.get(0).right = false;
+				snake.body.get(0).left = true;
+				snake.body.get(0).down = false;
+				snake.body.get(0).up = false;
+			}
+			else if((e.getKeyCode()==KeyEvent.VK_DOWN)&&(!snake.body.get(0).up)) {
+				snake.body.get(0).dx = 0;
+				snake.body.get(0).dy = 1;
+				snake.body.get(0).right = false;
+				snake.body.get(0).left = false;
+				snake.body.get(0).down = true;
+				snake.body.get(0).up = false;
+			}
+			else if((e.getKeyCode()==KeyEvent.VK_UP)&&(!snake.body.get(0).down)) {
+				snake.body.get(0).dx = 0;
+				snake.body.get(0).dy = -1;
+				snake.body.get(0).right = false;
+				snake.body.get(0).left = false;
+				snake.body.get(0).down = false;
+				snake.body.get(0).up = true;
+			}
+			keysPressed = true;
 		}
 	}
 }
