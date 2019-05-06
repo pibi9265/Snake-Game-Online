@@ -19,4 +19,12 @@ public class Snake{
 			body.get(i).y = y;
 		}
 	}
+	
+	public void updateLevel()
+	{
+		if(level == 1)
+		{
+			level++;
+		}
+	}
 }
