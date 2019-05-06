@@ -1,8 +1,10 @@
 /Apple.class
 /Board.class
-/ChatServerRunnable.class
+/ControlInputSender.class
+/GamePlayerDo.class
 /GameServer.class
+/GameServerDo.class
 /Part.class
+/PlayerManager.class
 /Snake.class
 /main.class
-/GameServerRunnable.class
