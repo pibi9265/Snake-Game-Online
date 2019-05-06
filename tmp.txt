@@ -1,0 +1,40 @@
+		frame.setBounds(0,0,weight+8,height+32);
+
+
+	private void move(Snake snake) {
+		for(int i = 0;i < snake.maxLength;i++) {
+			snake.body.get(i).x += snake.body.get(i).dx;
+			if(snake.body.get(i).x > (weight/grid) - 1) {
+				snake.body.get(i).x = 0;
+			}
+			else if(snake.body.get(i).x < 0) {
+				snake.body.get(i).x = (weight/grid) - 1;
+			}
+			snake.body.get(i).y += snake.body.get(i).dy;
+			if(snake.body.get(i).y > (height/grid) - 1) {
+				snake.body.get(i).y = 0;
+			}
+			else if(snake.body.get(i).y < 0) {
+				snake.body.get(i).y = (height/grid) - 1;
+			}
+		}
+	}
+
+    	private void collisionSA(Snake s, Apple a) {
+		if((s.body.get(0).x==a.x)&&(s.body.get(0).y==a.y)) {
+			s.body.add(new Part());
+			s.maxLength++;
+			s.body.get(s.maxLength-1).x = s.body.get(s.maxLength-2).x;
+			s.body.get(s.maxLength-1).y = s.body.get(s.maxLength-2).y;
+			s.body.get(s.maxLength-1).dx = s.body.get(s.maxLength-2).dx;
+			s.body.get(s.maxLength-1).dy = s.body.get(s.maxLength-2).dy;
+			s.body.get(s.maxLength-1).right = s.body.get(s.maxLength-2).right;
+			s.body.get(s.maxLength-1).left = s.body.get(s.maxLength-2).left;
+			s.body.get(s.maxLength-1).down = s.body.get(s.maxLength-2).down;
+			s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
+			s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
+			s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
+			a.x = random.nextInt(49);
+			a.y = random.nextInt(49);
+		}
+	}

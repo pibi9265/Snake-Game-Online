@@ -21,7 +21,7 @@ public class Board extends JComponent implements KeyListener{
 	public void init () {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setBounds(0,0,weight,height);
+		frame.setBounds(0,0,weight+(grid/2),height+(grid*2));
 		
 		frame.getContentPane().add(this);
 		frame.addKeyListener(this);
@@ -36,9 +36,9 @@ public class Board extends JComponent implements KeyListener{
 				Thread.sleep(50);
 				if(snake.moveCount == 2 - snake.level)
 				{
-					move();
+					move(snake);
 					repaint();
-					shiftDir();
+					shiftDir(snake);
 					collisionHB(snake, snake);
 					collisionSA(snake, apple);
 					snake.moveCount = 0;
@@ -66,7 +66,7 @@ public class Board extends JComponent implements KeyListener{
 		g.fillRect(apple.x*grid, apple.y*grid, grid , grid);
 	}
 	
-	private void shiftDir() {
+	private void shiftDir(Snake snake) {
 		for(int i = (snake.maxLength-1);i > 0;i--) {
 			if(snake.body.get(i).dx != snake.body.get(i-1).dx) {
 				snake.body.get(i).dx = snake.body.get(i-1).dx;
@@ -77,21 +77,21 @@ public class Board extends JComponent implements KeyListener{
 		}
 	}
 	
-	private void move() {
+	private void move(Snake snake) {
 		for(int i = 0;i < snake.maxLength;i++) {
 			snake.body.get(i).x += snake.body.get(i).dx;
-			if(snake.body.get(i).x > (weight/grid)) {
+			if(snake.body.get(i).x > (weight/grid) - 1) {
 				snake.body.get(i).x = 0;
 			}
 			else if(snake.body.get(i).x < 0) {
-				snake.body.get(i).x = (weight/grid);
+				snake.body.get(i).x = (weight/grid) - 1;
 			}
 			snake.body.get(i).y += snake.body.get(i).dy;
-			if(snake.body.get(i).y > (height/grid)) {
+			if(snake.body.get(i).y > (height/grid) - 1) {
 				snake.body.get(i).y = 0;
 			}
 			else if(snake.body.get(i).y < 0) {
-				snake.body.get(i).y = (height/grid);
+				snake.body.get(i).y = (height/grid) - 1;
 			}
 		}
 	}
@@ -137,6 +137,7 @@ public class Board extends JComponent implements KeyListener{
 			s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
 			s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
 			s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
+<<<<<<< HEAD
 			a.x = random.nextInt(50);
 			a.y = random.nextInt(50);
 			
@@ -144,6 +145,10 @@ public class Board extends JComponent implements KeyListener{
 			{
 				s.updateLevel();
 			}
+=======
+			a.x = random.nextInt(49);
+			a.y = random.nextInt(49);
+>>>>>>> a961a3613e2c5d79bd2ade0f0d1f7eb8f0dec3ec
 		}
 	}
 	
