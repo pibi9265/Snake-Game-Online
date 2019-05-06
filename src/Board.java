@@ -32,10 +32,10 @@ public class Board extends JComponent implements KeyListener{
 		
 		try {
 			while(true) {
-				keysPressed = false;
 				Thread.sleep(50);
 				if(snake.moveCount == 2 - snake.level)
 				{
+					keysPressed = false;
 					move(snake);
 					repaint();
 					shiftDir(snake);
