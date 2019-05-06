@@ -137,18 +137,12 @@ public class Board extends JComponent implements KeyListener{
 			s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
 			s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
 			s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
-<<<<<<< HEAD
-			a.x = random.nextInt(50);
-			a.y = random.nextInt(50);
-			
+			a.x = random.nextInt(49);
+			a.y = random.nextInt(49);
 			if(s.maxLength > 10)
 			{
 				s.updateLevel();
 			}
-=======
-			a.x = random.nextInt(49);
-			a.y = random.nextInt(49);
->>>>>>> a961a3613e2c5d79bd2ade0f0d1f7eb8f0dec3ec
 		}
 	}
 	
