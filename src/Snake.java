@@ -5,6 +5,7 @@ public class Snake{
 	public int maxLength = 4;
 	public int level = 1;
 	public int moveCount = 0;
+	public boolean keysPressed = false;
 	public Snake(){
 		for(int i = 0;i < maxLength;i++) {
 			body.add(new Part());

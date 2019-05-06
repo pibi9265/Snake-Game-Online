@@ -16,7 +16,6 @@ public class Board extends JComponent implements KeyListener{
 	private Apple apple = new Apple(20, 20);
 	private Random random = new Random();
 	public int grid = 16;
-	public boolean keysPressed = false;
 	
 	public void init () {
 		JFrame frame = new JFrame();
@@ -35,7 +34,7 @@ public class Board extends JComponent implements KeyListener{
 				Thread.sleep(50);
 				if(snake.moveCount == 2 - snake.level)
 				{
-					keysPressed = false;
+					snake.keysPressed = false;
 					move(snake);
 					repaint();
 					shiftDir(snake);
@@ -149,7 +148,7 @@ public class Board extends JComponent implements KeyListener{
 	public void keyReleased(KeyEvent e) {}
 	public void keyTyped(KeyEvent e) {}
 	public void keyPressed(KeyEvent e) {
-		if(!keysPressed)
+		if(!snake.keysPressed)
 		{
 			if((e.getKeyCode()==KeyEvent.VK_RIGHT)&&(!snake.body.get(0).left)) {
 			snake.body.get(0).dx = 1;
@@ -183,7 +182,7 @@ public class Board extends JComponent implements KeyListener{
 				snake.body.get(0).down = false;
 				snake.body.get(0).up = true;
 			}
-			keysPressed = true;
+			snake.keysPressed = true;
 		}
 	}
 }
