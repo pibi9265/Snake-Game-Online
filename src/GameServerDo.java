@@ -71,6 +71,7 @@ class PlayerManager implements Runnable {
 	ArrayList<Snake> snake;
 	ObjectInputStream[] objectInputStreams;
 	ObjectOutputStream[] objectOutputStreams;
+	Reader[] charReader;
 	
 	char dirInput;
 	int playerCount;
@@ -79,7 +80,7 @@ class PlayerManager implements Runnable {
 	private int height = 800;
 	public int grid = 16;
 	private Random random = new Random();
-	private Apple apple = new Apple(20, 20);
+	public Apple apple = new Apple(20, 20);
 	
 	PlayerManager(Socket[] socket, int playerCount) throws IOException, ClassNotFoundException
 	{
@@ -89,56 +90,67 @@ class PlayerManager implements Runnable {
 		
 		objectInputStreams = new ObjectInputStream[playerCount];
 		objectOutputStreams = new ObjectOutputStream[playerCount];
-		
+		charReader = new Reader[playerCount];
 		for(int i=0; i<playerCount; i++)
 		{
 			objectOutputStreams[i] = new ObjectOutputStream(clientSocket[i].getOutputStream());
 			objectInputStreams[i] = new ObjectInputStream(clientSocket[i].getInputStream());
+			charReader[i] = new InputStreamReader(clientSocket[i].getInputStream());
+			snake.add(new Snake());
 		}
 	}
 	
 	public void run()
 	{
-		for(int i=0; i<playerCount; i++)
-		{
-			snake.add(new Snake());
-		}
 		while(true)
-		{	
+		{
+			InputInfo serverOutput = new InputInfo();
+			try 
+			{
+				serverOutput.inputSnake.addAll(snake);
+				serverOutput.inputApple = apple.clone();
+			} catch (CloneNotSupportedException e1)
+			{
+				e1.printStackTrace();
+			}
+			
+			for(int i=0; i<playerCount; i++)
+	    	{
+				try
+				{
+					objectOutputStreams[i].writeObject(serverOutput);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	    	}
+			
 			for(int i=0; i<playerCount; i++)
 	    	{
 				try {
-					dirInput = (char)objectInputStreams[i].readObject();
-					
+					System.out.println("reading char in progress");
+					dirInput = (char)charReader[i].read();
+					System.out.println("read char complete");
 		    		setDirection(snake.get(i), dirInput);
 		        	move(snake.get(i));
-		        	shiftDir(snake.get(i));
-		        	for(int j=0; j<playerCount; j++)
-		        	{
-	        			collisionHB(snake.get(i), snake.get(j));
-	        			if(i != j)
-	        			{
-	        				collisionHH(snake.get(i), snake.get(j));
-	        			}
-		        	}	        	
-				} catch (IOException | ClassNotFoundException e) {
+		        	shiftDir(snake.get(i));    	
+				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace(); 
 				}
 	    	}
 			
-			collisionHA(snake, apple);
-			
 			for(int i=0; i<playerCount; i++)
-	    	{
-				try {
-					objectOutputStreams[i].writeObject(snake);
-					objectOutputStreams[i].writeObject(apple);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	    	}
+			{
+				for(int j=0; j<playerCount; j++)
+	        	{
+        			collisionHB(snake.get(i), snake.get(j));
+        			if(i != j)
+        			{
+        				collisionHH(snake.get(i), snake.get(j));
+        			}
+	        	}	    
+			}
+			collisionHA(snake, apple);
 		}
 	}
 	
@@ -246,10 +258,9 @@ class PlayerManager implements Runnable {
 	}
 
 	private void collisionHA(ArrayList<Snake> snakes, Apple a) {
-		Iterator<Snake> it = snakes.iterator();
-		while(it.hasNext())
+		for(int i=0; i<snakes.size(); i++)
 		{
-			Snake s = it.next();
+			Snake s = snakes.get(i);
 			
 			if((s.body.get(0).x==a.x)&&(s.body.get(0).y==a.y)) {
 				s.body.add(new Part());
@@ -271,14 +282,13 @@ class PlayerManager implements Runnable {
 			}
 		}
 		
-		it = snakes.iterator();
 		while(true){
 			a.x = random.nextInt(49);
 			a.y = random.nextInt(49);
 			
-			while(it.hasNext())
+			for(int i=0; i<snakes.size(); i++)
 			{
-				if(collisionSA(it.next(), apple)){
+				if(collisionSA(snakes.get(i), a)){
 					continue;
 				}
 			}
