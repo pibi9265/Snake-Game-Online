@@ -7,7 +7,7 @@ import java.io.*;
 
 class GameServerDo {
 	public static void main(String args[]) {
-		int serverPort = 4999;
+		int serverPort = 5001;
 		
 		GameServer server = new GameServer(serverPort);
 		new Thread(server).start();
@@ -19,7 +19,7 @@ class GameServer implements Runnable {
 	protected ServerSocket serverSocket;
 	Socket playerSocket[] = new Socket[4];
 	int playerCount = 0;
-	boolean gameStarted = false;
+	boolean gameStart = false;
 	
 	public GameServer(int port)
 	{
@@ -42,17 +42,23 @@ class GameServer implements Runnable {
 				clientSocket = this.serverSocket.accept();
 				playerSocket[playerCount] = clientSocket;
 				playerCount++;
-				if(gameStarted)
+				
+				if(playerCount == 1)
+				{
+					gameStart = true;
+				}
+				if(gameStart)
 				{
 					break;
 				}
 			} catch (IOException e) {
 				throw new RuntimeException(
-						"Error accepting client connection", e);
+					"Error accepting client connection", e);
 			}
 		}
+		
 		try {
-			new Thread(new PlayerManager(playerSocket)).start();
+			new Thread(new PlayerManager(playerSocket, playerCount)).start();
 		} catch (ClassNotFoundException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -63,63 +69,87 @@ class GameServer implements Runnable {
 class PlayerManager implements Runnable {
 	Socket[] clientSocket;
 	Snake[] snake;
-	Reader charInputStream;
 	char dirInput;
+	int playerCount;
 	
+	//보드 컨트롤 정보들
 	private int weight = 800;
 	private int height = 800;
 	public int grid = 16;
 	private Random random = new Random();
 	private Apple apple = new Apple(20, 20);
 	
-	PlayerManager(Socket[] socket) throws IOException, ClassNotFoundException
+	PlayerManager(Socket[] socket, int playerCount) throws IOException, ClassNotFoundException
 	{
 		clientSocket = socket;
-		for(int i=0; i<clientSocket.length; i++)
-		{
-	        ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket[i].getInputStream());
-	    	snake[i] = (Snake)objectInputStream.readObject();
-	    	objectInputStream.close();
-		}
+		this.playerCount = playerCount;
+		snake = new Snake[playerCount];
 	}
 	
 	public void run()
 	{
-		for(int i=0; i<clientSocket.length; i++)
-    	{
-			try {
-				charInputStream = new InputStreamReader(clientSocket[i].getInputStream());
-				dirInput = (char) charInputStream.read();
-	    		setDirection(snake[i], dirInput);
-	        	move(snake[i]);
-	        	shiftDir(snake[i]);
-	        	for(int j=0; j<clientSocket.length; j++)
-	        	{
-	        		if(i != j)
-	        		{
+		while(true)
+		{
+			for(int i=0; i<playerCount; i++)
+			{
+				try {
+			        ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket[i].getInputStream());
+					System.out.println("Reading snake");
+			        snake[i] = (Snake)objectInputStream.readObject();
+			        System.out.println("Done");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			for(int i=0; i<playerCount; i++)
+	    	{
+				try {
+					Reader charInputStream = new InputStreamReader(clientSocket[i].getInputStream());
+					System.out.println("Reading char");
+					dirInput = (char) charInputStream.read();
+					System.out.println("Done");
+					
+		    		setDirection(snake[i], dirInput);
+		        	move(snake[i]);
+		        	shiftDir(snake[i]);
+		        	for(int j=0; j<playerCount; j++)
+		        	{
 	        			collisionHB(snake[i], snake[j]);
-	        		}
-	        	}
-	        	collisionHA(snake[i], apple, snake);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-		
-		for(int i=0; i<clientSocket.length; i++)
-    	{
-			ObjectOutputStream objectOutputStream = null;
-			try {
-				objectOutputStream = new ObjectOutputStream(clientSocket[i].getOutputStream());
-				objectOutputStream.writeObject(snake);
-				objectOutputStream.writeObject(apple);
-				objectOutputStream.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}		
+	        			if(i != j)
+	        			{
+	        				collisionHH(snake[i], snake[j]);
+	        			}
+		        	}	        	
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    	}
+			
+			collisionHA(snake, apple);
+			
+			for(int i=0; i<playerCount; i++)
+	    	{
+				try {
+					OutputStream outputStream = clientSocket[i].getOutputStream();
+					System.out.println("writing playerNumber");
+					outputStream.write(i);
+					
+					ObjectOutputStream objectOutputStream = new ObjectOutputStream(clientSocket[i].getOutputStream());
+					System.out.println("writing snakes");
+					objectOutputStream.writeObject(snake);
+					System.out.println("Done");
+					System.out.println("writing apple");
+					objectOutputStream.writeObject(apple);
+					System.out.println("Done");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    	}
+		}
 	}
 	
 	private void setDirection(Snake snake, char direction)
@@ -127,12 +157,12 @@ class PlayerManager implements Runnable {
 		if(!snake.keysPressed)
 		{
 			if(direction == 'R' && (!snake.body.get(0).left)) {
-			snake.body.get(0).dx = 1;
-			snake.body.get(0).dy = 0;
-			snake.body.get(0).right = true;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = false;
+				snake.body.get(0).dx = 1;
+				snake.body.get(0).dy = 0;
+				snake.body.get(0).right = true;
+				snake.body.get(0).left = false;
+				snake.body.get(0).down = false;
+				snake.body.get(0).up = false;
 			}
 			else if(direction == 'L' && (!snake.body.get(0).right)) {
 				snake.body.get(0).dx = -1;
@@ -230,37 +260,42 @@ class PlayerManager implements Runnable {
 		return false;
 	}
 
-	private void collisionHA(Snake s, Apple a, Snake[] snakes) {
-		if((s.body.get(0).x==a.x)&&(s.body.get(0).y==a.y)) {
-			s.body.add(new Part());
-			s.maxLength++;
-			s.body.get(s.maxLength-1).x = s.body.get(s.maxLength-2).x;
-			s.body.get(s.maxLength-1).y = s.body.get(s.maxLength-2).y;
-			s.body.get(s.maxLength-1).dx = s.body.get(s.maxLength-2).dx;
-			s.body.get(s.maxLength-1).dy = s.body.get(s.maxLength-2).dy;
-			s.body.get(s.maxLength-1).right = s.body.get(s.maxLength-2).right;
-			s.body.get(s.maxLength-1).left = s.body.get(s.maxLength-2).left;
-			s.body.get(s.maxLength-1).down = s.body.get(s.maxLength-2).down;
-			s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
-			s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
-			s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
-			while(true){
-				a.x = random.nextInt(49);
-				a.y = random.nextInt(49);
-				
-				for(int i=0; i<snakes.length; i++)
-				{
-					if(collisionSA(snake[i], apple)){
-						continue;
-					}
-				}
-				break;
-			}
+	private void collisionHA(Snake[] snakes, Apple a) {
+		for(int i=0; i<snakes.length; i++)
+		{
+			Snake s = snakes[i];
 			
-			if(s.maxLength > 10)
-			{
-				s.updateLevel();
+			if((s.body.get(0).x==a.x)&&(s.body.get(0).y==a.y)) {
+				s.body.add(new Part());
+				s.maxLength++;
+				s.body.get(s.maxLength-1).x = s.body.get(s.maxLength-2).x;
+				s.body.get(s.maxLength-1).y = s.body.get(s.maxLength-2).y;
+				s.body.get(s.maxLength-1).dx = s.body.get(s.maxLength-2).dx;
+				s.body.get(s.maxLength-1).dy = s.body.get(s.maxLength-2).dy;
+				s.body.get(s.maxLength-1).right = s.body.get(s.maxLength-2).right;
+				s.body.get(s.maxLength-1).left = s.body.get(s.maxLength-2).left;
+				s.body.get(s.maxLength-1).down = s.body.get(s.maxLength-2).down;
+				s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
+				s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
+				s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
+				if(s.maxLength > 10)
+				{
+					s.updateLevel();
+				}
 			}
+		}
+		
+		while(true){
+			a.x = random.nextInt(49);
+			a.y = random.nextInt(49);
+			
+			for(int i=0; i<snakes.length; i++)
+			{
+				if(collisionSA(snake[i], apple)){
+					continue;
+				}
+			}
+			break;
 		}
 	}
 	

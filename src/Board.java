@@ -12,8 +12,8 @@ import java.util.Random;
 public class Board extends JComponent{
 	private int weight = 800;
 	private int height = 800;
-	private Snake snake = new Snake(10, 10);
-	public Apple apple = new Apple(20, 20);
+	public Snake[] snakes = null;
+	public Apple apple;
 	public int grid = 16;
 	
 	public void init () {
@@ -27,22 +27,21 @@ public class Board extends JComponent{
 		frame.requestFocus();
 	}
 	
-	public void SnakeAction(Snake snake)
-	{
-		//snake.keysPressed = false;
-		repaint();
-		//snake.moveCount = 0;
-	}
-	
 	public void paint (Graphics g) {
-		g.setColor(Color.black);
-		for(int i = 0;i < snake.maxLength;i++) {
-			g.drawRect(snake.body.get(i).x*grid, snake.body.get(i).y*grid, grid , grid);
-			g.fillRect(snake.body.get(i).x*grid, snake.body.get(i).y*grid, grid , grid);
+		if(!(snakes == null))
+		{
+			g.setColor(Color.black);
+			for(int i=0; i<snakes.length; i++)
+			{
+				Snake snake = snakes[i];
+				for(int j = 0;j < snake.maxLength;j++) {
+					g.drawRect(snake.body.get(i).x*grid, snake.body.get(i).y*grid, grid , grid);
+					g.fillRect(snake.body.get(i).x*grid, snake.body.get(i).y*grid, grid , grid);
+				}
+			}
+			g.setColor(Color.red);
+			g.drawRect(apple.x*grid, apple.y*grid, grid , grid);
+			g.fillRect(apple.x*grid, apple.y*grid, grid , grid);
 		}
-		
-		g.setColor(Color.red);
-		g.drawRect(apple.x*grid, apple.y*grid, grid , grid);
-		g.fillRect(apple.x*grid, apple.y*grid, grid , grid);
 	}
 }

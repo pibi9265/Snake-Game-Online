@@ -1,6 +1,9 @@
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public class Snake{
+public class Snake implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	public ArrayList<Part> body = new ArrayList<Part>();
 	public int maxLength = 4;
 	public int level = 1;

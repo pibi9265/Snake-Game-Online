@@ -6,11 +6,9 @@ import java.net.Socket;
 
 public class GamePlayerDo {
 	public static void main(String[] args) throws IOException {
-		String server = "192.168.15.1";
-		int port = -1;
+		String server = "192.168.58.1";
+		int port = 5001;
 		Socket gameSocket = null;
-		
-		port = 4999;
 		
 		try {
 			gameSocket = new Socket(server, port);
@@ -26,20 +24,21 @@ public class GamePlayerDo {
 
 class ControlInputSender implements Runnable, KeyListener
 {
-	Board board = new Board();
+	Board board;
 	private Socket gameSocket = null;
+	Snake mySnake;
+	int playerNumber;
+	
 	Writer charOutputWriter;
-	ObjectInputStream objectInputStream;
-	Snake[] snake;
-	Apple apple;
 	char inputControl;
 	
 	ControlInputSender(Socket socket) throws IOException
 	{
 		gameSocket = socket;
-		charOutputWriter = new OutputStreamWriter(socket.getOutputStream());
-		objectInputStream = new ObjectInputStream(socket.getInputStream());
+		mySnake = new Snake();
+		board = new Board();
 		board.init();
+		inputControl = 'R';
 	}
 	
 	public void run() {
@@ -47,8 +46,21 @@ class ControlInputSender implements Runnable, KeyListener
 		{
 			try {
 				Thread.sleep(50);
+				ObjectOutputStream objectOutputStream = new ObjectOutputStream(gameSocket.getOutputStream());
+				objectOutputStream.writeObject(mySnake);
+				
+				Writer charOutputWriter = new OutputStreamWriter(gameSocket.getOutputStream());
 				charOutputWriter.write(inputControl);
-				snake = (Snake[])objectInputStream.readObject();
+				
+				playerNumber = gameSocket.getInputStream().read();
+				
+				ObjectInputStream objectInputStream = new ObjectInputStream(gameSocket.getInputStream());
+				board.snakes = (Snake[])objectInputStream.readObject();
+
+				board.apple = (Apple)objectInputStream.readObject();
+				mySnake = board.snakes[playerNumber];
+				
+				board.repaint();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
