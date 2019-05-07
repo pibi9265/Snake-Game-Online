@@ -3,10 +3,11 @@ import java.awt.event.KeyListener;
 import java.io.*;
 import java.net.BindException;
 import java.net.Socket; 
+import java.util.ArrayList;
 
 public class GamePlayerDo {
 	public static void main(String[] args) throws IOException {
-		String server = "192.168.15.1";
+		String server = "192.168.58.1";
 		int port = 4999;
 		Socket gameSocket = null;
 		
@@ -22,86 +23,39 @@ public class GamePlayerDo {
 	}
 }
 
-class ControlInputSender implements Runnable, KeyListener
+class ControlInputSender implements Runnable
 {
-	Board board;
+	Board board = new Board();
 	private Socket gameSocket = null;
-	Snake mySnake;
-	int playerNumber;
 	
-	InputStream ip;
-	OutputStream op;
 	ObjectOutputStream objectOutputStream;
-	Writer charOutputWriter;
 	ObjectInputStream objectInputStream;
-	
-	char inputControl;
 	
 	ControlInputSender(Socket socket) throws IOException
 	{
 		gameSocket = socket;
-		op = socket.getOutputStream();
-		objectOutputStream = new ObjectOutputStream(op);
-		ip = socket.getInputStream();
-		objectInputStream = new ObjectInputStream(ip);
-		
-		mySnake = new Snake();
-		board = new Board();
+		objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+		objectInputStream = new ObjectInputStream(socket.getInputStream());
+
 		board.init();
-		inputControl = 'R';
-		
-		System.out.println("Game Player Init Complete");
 	}
 	
 	public void run() {
 		while(true)
 		{
 			try {
-				objectOutputStream.writeObject(mySnake);
-				System.out.println("Writing Snake object Complete");
-				objectOutputStream.write((int)inputControl);
-				System.out.println("Writing Input Control Complete");
+				//System.out.println(board.inputControl);
+				objectOutputStream.writeObject(board.inputControl);
 				
-				playerNumber = objectInputStream.read();
-				System.out.println("Reading Player Number Complete");
-				board.snakes = (Snake[])objectInputStream.readObject();
-				System.out.println("Reading snake objects Complete");
+				board.snakes = (ArrayList<Snake>)objectInputStream.readObject();
 				board.apple = (Apple)objectInputStream.readObject();
-				System.out.println("Reading apple object Complete");
-				mySnake = board.snakes[playerNumber];
-				
+
 				board.repaint();
+				Thread.sleep(50);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
-	
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if(e.getKeyCode()==KeyEvent.VK_RIGHT) {
-			inputControl = 'R';
-		}
-		else if(e.getKeyCode()==KeyEvent.VK_LEFT) {
-			inputControl = 'L';
-		}
-		else if(e.getKeyCode()==KeyEvent.VK_DOWN) {
-			inputControl = 'D';
-		}
-		else if(e.getKeyCode()==KeyEvent.VK_UP) {
-			inputControl = 'U';
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-	}	
 }

@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.io.Serializable;
 
-public class Snake implements Serializable{
+public class Snake implements Serializable, Cloneable{
 	private static final long serialVersionUID = 1L;
 	
 	public ArrayList<Part> body = new ArrayList<Part>();
@@ -31,4 +31,24 @@ public class Snake implements Serializable{
 			level++;
 		}
 	}
+	
+	public Snake clone() throws CloneNotSupportedException
+	{
+		Snake mySnake = (Snake)super.clone();
+		mySnake.body = listCopy(body);
+		return mySnake;
+	}
+	
+	ArrayList<Part> listCopy(ArrayList<Part> list){
+        ArrayList<Part> temp = new ArrayList<Part>();
+        for(int i = 0; i < list.size(); i++){
+            try {
+                temp.add(list.get(i).clone());
+            } catch (CloneNotSupportedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return temp;
+    }
 }

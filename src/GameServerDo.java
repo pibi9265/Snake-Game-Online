@@ -1,7 +1,7 @@
 import java.net.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
-
-import javax.swing.JFrame;
 
 import java.io.*;
 
@@ -68,9 +68,7 @@ class GameServer implements Runnable {
 
 class PlayerManager implements Runnable {
 	Socket[] clientSocket;
-	Snake[] snake;
-	OutputStream[] ops;
-	InputStream[] ips;
+	ArrayList<Snake> snake;
 	ObjectInputStream[] objectInputStreams;
 	ObjectOutputStream[] objectOutputStreams;
 	
@@ -87,75 +85,55 @@ class PlayerManager implements Runnable {
 	{
 		clientSocket = socket;
 		this.playerCount = playerCount;
-		snake = new Snake[playerCount];
+		snake = new ArrayList<Snake>();
 		
-		ops = new OutputStream[playerCount];
-		ips = new InputStream[playerCount];
 		objectInputStreams = new ObjectInputStream[playerCount];
 		objectOutputStreams = new ObjectOutputStream[playerCount];
 		
 		for(int i=0; i<playerCount; i++)
 		{
-			ops[i] = clientSocket[i].getOutputStream();
-			objectOutputStreams[i] = new ObjectOutputStream(ops[i]);
-
-			ips[i] = clientSocket[i].getInputStream();
-			objectInputStreams[i] = new ObjectInputStream(ips[i]);
+			objectOutputStreams[i] = new ObjectOutputStream(clientSocket[i].getOutputStream());
+			objectInputStreams[i] = new ObjectInputStream(clientSocket[i].getInputStream());
 		}
-		
-		System.out.println("Game Server Init Complete");		
 	}
 	
 	public void run()
 	{
-		while(true)
+		for(int i=0; i<playerCount; i++)
 		{
-			for(int i=0; i<playerCount; i++)
-			{
-				try {
-			        snake[i] = (Snake)objectInputStreams[i].readObject();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			System.out.println("Getting Snake Complete");
-			
+			snake.add(new Snake());
+		}
+		while(true)
+		{	
 			for(int i=0; i<playerCount; i++)
 	    	{
 				try {
-					dirInput = (char) objectInputStreams[i].read();
-					System.out.println("Reading Player Input Complete");
+					dirInput = (char)objectInputStreams[i].readObject();
 					
-		    		setDirection(snake[i], dirInput);
-		        	move(snake[i]);
-		        	shiftDir(snake[i]);
+		    		setDirection(snake.get(i), dirInput);
+		        	move(snake.get(i));
+		        	shiftDir(snake.get(i));
 		        	for(int j=0; j<playerCount; j++)
 		        	{
-	        			collisionHB(snake[i], snake[j]);
+	        			collisionHB(snake.get(i), snake.get(j));
 	        			if(i != j)
 	        			{
-	        				collisionHH(snake[i], snake[j]);
+	        				collisionHH(snake.get(i), snake.get(j));
 	        			}
 		        	}	        	
-				} catch (IOException e) {
+				} catch (IOException | ClassNotFoundException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					e.printStackTrace(); 
 				}
 	    	}
 			
 			collisionHA(snake, apple);
-			System.out.println("Dealing with Player Input Complete");
-
+			
 			for(int i=0; i<playerCount; i++)
 	    	{
 				try {
-					objectOutputStreams[i].write(i);
-					System.out.println("Writing Player Number Complete");
 					objectOutputStreams[i].writeObject(snake);
-					System.out.println("Writing snake objects Complete");
 					objectOutputStreams[i].writeObject(apple);
-					System.out.println("Writing apple object Complete");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -166,41 +144,37 @@ class PlayerManager implements Runnable {
 	
 	private void setDirection(Snake snake, char direction)
 	{
-		if(!snake.keysPressed)
-		{
-			if(direction == 'R' && (!snake.body.get(0).left)) {
-				snake.body.get(0).dx = 1;
-				snake.body.get(0).dy = 0;
-				snake.body.get(0).right = true;
-				snake.body.get(0).left = false;
-				snake.body.get(0).down = false;
-				snake.body.get(0).up = false;
-			}
-			else if(direction == 'L' && (!snake.body.get(0).right)) {
-				snake.body.get(0).dx = -1;
-				snake.body.get(0).dy = 0;
-				snake.body.get(0).right = false;
-				snake.body.get(0).left = true;
-				snake.body.get(0).down = false;
-				snake.body.get(0).up = false;
-			}
-			else if(direction == 'D' && (!snake.body.get(0).up)) {
-				snake.body.get(0).dx = 0;
-				snake.body.get(0).dy = 1;
-				snake.body.get(0).right = false;
-				snake.body.get(0).left = false;
-				snake.body.get(0).down = true;
-				snake.body.get(0).up = false;
-			}
-			else if(direction == 'U' && (!snake.body.get(0).down)) {
-				snake.body.get(0).dx = 0;
-				snake.body.get(0).dy = -1;
-				snake.body.get(0).right = false;
-				snake.body.get(0).left = false;
-				snake.body.get(0).down = false;
-				snake.body.get(0).up = true;
-			}
-			snake.keysPressed = true;
+		if(direction == 'R' && (!snake.body.get(0).left)) {
+			snake.body.get(0).dx = 1;
+			snake.body.get(0).dy = 0;
+			snake.body.get(0).right = true;
+			snake.body.get(0).left = false;
+			snake.body.get(0).down = false;
+			snake.body.get(0).up = false;
+		}
+		else if(direction == 'L' && (!snake.body.get(0).right)) {
+			snake.body.get(0).dx = -1;
+			snake.body.get(0).dy = 0;
+			snake.body.get(0).right = false;
+			snake.body.get(0).left = true;
+			snake.body.get(0).down = false;
+			snake.body.get(0).up = false;
+		}
+		else if(direction == 'D' && (!snake.body.get(0).up)) {
+			snake.body.get(0).dx = 0;
+			snake.body.get(0).dy = 1;
+			snake.body.get(0).right = false;
+			snake.body.get(0).left = false;
+			snake.body.get(0).down = true;
+			snake.body.get(0).up = false;
+		}
+		else if(direction == 'U' && (!snake.body.get(0).down)) {
+			snake.body.get(0).dx = 0;
+			snake.body.get(0).dy = -1;
+			snake.body.get(0).right = false;
+			snake.body.get(0).left = false;
+			snake.body.get(0).down = false;
+			snake.body.get(0).up = true;
 		}
 	}
 	
@@ -262,7 +236,6 @@ class PlayerManager implements Runnable {
 		}
 	}
 	
-	//
 	private boolean collisionSA(Snake s, Apple a){
 		for(int i = 0;i < s.maxLength;i++) {
 			if((a.x==s.body.get(i).x)&&(a.y==s.body.get(i).y)) {
@@ -272,10 +245,11 @@ class PlayerManager implements Runnable {
 		return false;
 	}
 
-	private void collisionHA(Snake[] snakes, Apple a) {
-		for(int i=0; i<snakes.length; i++)
+	private void collisionHA(ArrayList<Snake> snakes, Apple a) {
+		Iterator<Snake> it = snakes.iterator();
+		while(it.hasNext())
 		{
-			Snake s = snakes[i];
+			Snake s = it.next();
 			
 			if((s.body.get(0).x==a.x)&&(s.body.get(0).y==a.y)) {
 				s.body.add(new Part());
@@ -297,18 +271,18 @@ class PlayerManager implements Runnable {
 			}
 		}
 		
+		it = snakes.iterator();
 		while(true){
 			a.x = random.nextInt(49);
 			a.y = random.nextInt(49);
 			
-			for(int i=0; i<snakes.length; i++)
+			while(it.hasNext())
 			{
-				if(collisionSA(snake[i], apple)){
+				if(collisionSA(it.next(), apple)){
 					continue;
 				}
 			}
 			break;
 		}
 	}
-	
 }
