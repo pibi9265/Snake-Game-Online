@@ -29,7 +29,7 @@ class GameServer implements Runnable {
 	@Override
 	public void run() {
 		try {
-			this.serverSocket = new ServerSocket(this.serverPort);
+			serverSocket = new ServerSocket(serverPort);
 		} catch(IOException e)
 		{
 			throw new RuntimeException("Cannot open port "+serverPort, e);
@@ -39,7 +39,7 @@ class GameServer implements Runnable {
 			Socket clientSocket = null;
 			
 			try {
-				clientSocket = this.serverSocket.accept();
+				clientSocket = serverSocket.accept();
 				playerSocket[playerCount] = clientSocket;
 				playerCount++;
 				
@@ -94,9 +94,7 @@ class PlayerManager implements Runnable {
 			{
 				try {
 			        ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket[i].getInputStream());
-					System.out.println("Reading snake");
 			        snake[i] = (Snake)objectInputStream.readObject();
-			        System.out.println("Done");
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -107,9 +105,7 @@ class PlayerManager implements Runnable {
 	    	{
 				try {
 					Reader charInputStream = new InputStreamReader(clientSocket[i].getInputStream());
-					System.out.println("Reading char");
 					dirInput = (char) charInputStream.read();
-					System.out.println("Done");
 					
 		    		setDirection(snake[i], dirInput);
 		        	move(snake[i]);
@@ -134,16 +130,11 @@ class PlayerManager implements Runnable {
 	    	{
 				try {
 					OutputStream outputStream = clientSocket[i].getOutputStream();
-					System.out.println("writing playerNumber");
 					outputStream.write(i);
 					
 					ObjectOutputStream objectOutputStream = new ObjectOutputStream(clientSocket[i].getOutputStream());
-					System.out.println("writing snakes");
 					objectOutputStream.writeObject(snake);
-					System.out.println("Done");
-					System.out.println("writing apple");
 					objectOutputStream.writeObject(apple);
-					System.out.println("Done");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
