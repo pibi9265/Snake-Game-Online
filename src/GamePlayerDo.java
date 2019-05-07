@@ -6,8 +6,8 @@ import java.net.Socket;
 
 public class GamePlayerDo {
 	public static void main(String[] args) throws IOException {
-		String server = "192.168.58.1";
-		int port = 5001;
+		String server = "192.168.15.1";
+		int port = 4999;
 		Socket gameSocket = null;
 		
 		try {
@@ -29,35 +29,45 @@ class ControlInputSender implements Runnable, KeyListener
 	Snake mySnake;
 	int playerNumber;
 	
+	InputStream ip;
+	OutputStream op;
+	ObjectOutputStream objectOutputStream;
 	Writer charOutputWriter;
+	ObjectInputStream objectInputStream;
+	
 	char inputControl;
 	
 	ControlInputSender(Socket socket) throws IOException
 	{
 		gameSocket = socket;
+		op = socket.getOutputStream();
+		objectOutputStream = new ObjectOutputStream(op);
+		ip = socket.getInputStream();
+		objectInputStream = new ObjectInputStream(ip);
+		
 		mySnake = new Snake();
 		board = new Board();
 		board.init();
 		inputControl = 'R';
+		
+		System.out.println("Game Player Init Complete");
 	}
 	
 	public void run() {
 		while(true)
 		{
 			try {
-				Thread.sleep(50);
-				ObjectOutputStream objectOutputStream = new ObjectOutputStream(gameSocket.getOutputStream());
 				objectOutputStream.writeObject(mySnake);
+				System.out.println("Writing Snake object Complete");
+				objectOutputStream.write((int)inputControl);
+				System.out.println("Writing Input Control Complete");
 				
-				Writer charOutputWriter = new OutputStreamWriter(gameSocket.getOutputStream());
-				charOutputWriter.write(inputControl);
-				
-				playerNumber = gameSocket.getInputStream().read();
-				
-				ObjectInputStream objectInputStream = new ObjectInputStream(gameSocket.getInputStream());
+				playerNumber = objectInputStream.read();
+				System.out.println("Reading Player Number Complete");
 				board.snakes = (Snake[])objectInputStream.readObject();
-
+				System.out.println("Reading snake objects Complete");
 				board.apple = (Apple)objectInputStream.readObject();
+				System.out.println("Reading apple object Complete");
 				mySnake = board.snakes[playerNumber];
 				
 				board.repaint();

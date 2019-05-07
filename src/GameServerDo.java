@@ -7,7 +7,7 @@ import java.io.*;
 
 class GameServerDo {
 	public static void main(String args[]) {
-		int serverPort = 5001;
+		int serverPort = 4999;
 		
 		GameServer server = new GameServer(serverPort);
 		new Thread(server).start();
@@ -69,10 +69,14 @@ class GameServer implements Runnable {
 class PlayerManager implements Runnable {
 	Socket[] clientSocket;
 	Snake[] snake;
+	OutputStream[] ops;
+	InputStream[] ips;
+	ObjectInputStream[] objectInputStreams;
+	ObjectOutputStream[] objectOutputStreams;
+	
 	char dirInput;
 	int playerCount;
 	
-	//보드 컨트롤 정보들
 	private int weight = 800;
 	private int height = 800;
 	public int grid = 16;
@@ -84,6 +88,22 @@ class PlayerManager implements Runnable {
 		clientSocket = socket;
 		this.playerCount = playerCount;
 		snake = new Snake[playerCount];
+		
+		ops = new OutputStream[playerCount];
+		ips = new InputStream[playerCount];
+		objectInputStreams = new ObjectInputStream[playerCount];
+		objectOutputStreams = new ObjectOutputStream[playerCount];
+		
+		for(int i=0; i<playerCount; i++)
+		{
+			ops[i] = clientSocket[i].getOutputStream();
+			objectOutputStreams[i] = new ObjectOutputStream(ops[i]);
+
+			ips[i] = clientSocket[i].getInputStream();
+			objectInputStreams[i] = new ObjectInputStream(ips[i]);
+		}
+		
+		System.out.println("Game Server Init Complete");		
 	}
 	
 	public void run()
@@ -93,19 +113,19 @@ class PlayerManager implements Runnable {
 			for(int i=0; i<playerCount; i++)
 			{
 				try {
-			        ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket[i].getInputStream());
-			        snake[i] = (Snake)objectInputStream.readObject();
+			        snake[i] = (Snake)objectInputStreams[i].readObject();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
+			System.out.println("Getting Snake Complete");
 			
 			for(int i=0; i<playerCount; i++)
 	    	{
 				try {
-					Reader charInputStream = new InputStreamReader(clientSocket[i].getInputStream());
-					dirInput = (char) charInputStream.read();
+					dirInput = (char) objectInputStreams[i].read();
+					System.out.println("Reading Player Input Complete");
 					
 		    		setDirection(snake[i], dirInput);
 		        	move(snake[i]);
@@ -125,16 +145,17 @@ class PlayerManager implements Runnable {
 	    	}
 			
 			collisionHA(snake, apple);
-			
+			System.out.println("Dealing with Player Input Complete");
+
 			for(int i=0; i<playerCount; i++)
 	    	{
 				try {
-					OutputStream outputStream = clientSocket[i].getOutputStream();
-					outputStream.write(i);
-					
-					ObjectOutputStream objectOutputStream = new ObjectOutputStream(clientSocket[i].getOutputStream());
-					objectOutputStream.writeObject(snake);
-					objectOutputStream.writeObject(apple);
+					objectOutputStreams[i].write(i);
+					System.out.println("Writing Player Number Complete");
+					objectOutputStreams[i].writeObject(snake);
+					System.out.println("Writing snake objects Complete");
+					objectOutputStreams[i].writeObject(apple);
+					System.out.println("Writing apple object Complete");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
