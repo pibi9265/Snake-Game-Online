@@ -58,6 +58,7 @@ class GameServer implements Runnable {
 		}
 		
 		try {
+			System.out.println("Connection Established");
 			new Thread(new PlayerManager(playerSocket, playerCount)).start();
 		} catch (ClassNotFoundException | IOException e) {
 			// TODO Auto-generated catch block
@@ -123,7 +124,6 @@ class PlayerManager implements Runnable {
 		        	move(snake.get(i));
 		        	shiftDir(snake.get(i));    	
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace(); 
 				}
 	    	}

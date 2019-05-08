@@ -13,6 +13,7 @@ public class GamePlayerDo {
 		
 		try {
 			gameSocket = new Socket(server, port);
+			System.out.println("Connection Established");
 		} catch (BindException b) {
 			System.exit(1);
 		} catch (IOException i) {
