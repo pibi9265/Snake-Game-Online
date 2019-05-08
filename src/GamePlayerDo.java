@@ -16,7 +16,8 @@ public class GamePlayerDo {
 			System.out.println("Connection Established");
 		} catch (BindException b) {
 			System.exit(1);
-		} catch (IOException i) {
+		} catch (IOException i) 
+		{
 			System.exit(1);
 		}
 		

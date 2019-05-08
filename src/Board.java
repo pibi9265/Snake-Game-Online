@@ -36,13 +36,12 @@ public class Board extends JComponent implements KeyListener{
 		if(!snakes.isEmpty())
 		{
 			g.setColor(Color.black);
-			Iterator<Snake> it = snakes.iterator();
-			while(it.hasNext())
+			for(int i=0; i<snakes.size(); i++)
 			{
-				Snake snake = it.next();
-				for(int i = 0;i < snake.maxLength;i++) {
-					g.drawRect(snake.body.get(i).x*grid, snake.body.get(i).y*grid, grid , grid);
-					g.fillRect(snake.body.get(i).x*grid, snake.body.get(i).y*grid, grid , grid);
+				Snake snake = snakes.get(i);
+				for(int j = 0;j < snake.maxLength;j++) {
+					g.drawRect(snake.body.get(j).x*grid, snake.body.get(j).y*grid, grid , grid);
+					g.fillRect(snake.body.get(j).x*grid, snake.body.get(j).y*grid, grid , grid);
 				}
 			}
 		}
