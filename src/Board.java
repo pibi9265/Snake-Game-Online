@@ -33,8 +33,6 @@ public class Board extends JComponent implements KeyListener{
 	}
 	
 	public void paint (Graphics g) {
-		super.paint(g);
-		
 		if(!snakes.isEmpty())
 		{
 			g.setColor(Color.black);

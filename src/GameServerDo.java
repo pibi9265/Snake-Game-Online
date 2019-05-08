@@ -17,7 +17,7 @@ class GameServerDo {
 class GameServer implements Runnable {
 	protected int serverPort;
 	protected ServerSocket serverSocket;
-	Socket playerSocket[] = new Socket[4];
+	Socket[] playerSocket = new Socket[4];
 	int playerCount = 0;
 	boolean gameStart = false;
 	
@@ -71,7 +71,6 @@ class PlayerManager implements Runnable {
 	ArrayList<Snake> snake;
 	ObjectInputStream[] objectInputStreams;
 	ObjectOutputStream[] objectOutputStreams;
-	Reader[] charReader;
 	
 	char dirInput;
 	int playerCount;
@@ -90,12 +89,10 @@ class PlayerManager implements Runnable {
 		
 		objectInputStreams = new ObjectInputStream[playerCount];
 		objectOutputStreams = new ObjectOutputStream[playerCount];
-		charReader = new Reader[playerCount];
 		for(int i=0; i<playerCount; i++)
 		{
 			objectOutputStreams[i] = new ObjectOutputStream(clientSocket[i].getOutputStream());
 			objectInputStreams[i] = new ObjectInputStream(clientSocket[i].getInputStream());
-			charReader[i] = new InputStreamReader(clientSocket[i].getInputStream());
 			snake.add(new Snake());
 		}
 	}
@@ -104,21 +101,12 @@ class PlayerManager implements Runnable {
 	{
 		while(true)
 		{
-			InputInfo serverOutput = new InputInfo();
-			try 
-			{
-				serverOutput.inputSnake.addAll(snake);
-				serverOutput.inputApple = apple.clone();
-			} catch (CloneNotSupportedException e1)
-			{
-				e1.printStackTrace();
-			}
-			
 			for(int i=0; i<playerCount; i++)
 	    	{
 				try
 				{
-					objectOutputStreams[i].writeObject(serverOutput);
+					objectOutputStreams[i].writeObject(snake);
+					objectOutputStreams[i].writeObject(apple);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -128,8 +116,9 @@ class PlayerManager implements Runnable {
 	    	{
 				try {
 					System.out.println("reading char in progress");
-					dirInput = (char)charReader[i].read();
+					dirInput = objectInputStreams[i].readChar();
 					System.out.println("read char complete");
+					
 		    		setDirection(snake.get(i), dirInput);
 		        	move(snake.get(i));
 		        	shiftDir(snake.get(i));    	
