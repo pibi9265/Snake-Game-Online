@@ -106,8 +106,11 @@ class PlayerManager implements Runnable {
 	    	{
 				try
 				{
+					System.out.println(snake.get(0).body.get(0).x);
 					objectOutputStreams[i].writeObject(snake);
+					objectOutputStreams[i].flush();
 					objectOutputStreams[i].writeObject(apple);
+					objectOutputStreams[i].flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -116,9 +119,7 @@ class PlayerManager implements Runnable {
 			for(int i=0; i<playerCount; i++)
 	    	{
 				try {
-					System.out.println("reading char in progress");
 					dirInput = objectInputStreams[i].readChar();
-					System.out.println("read char complete");
 					
 		    		setDirection(snake.get(i), dirInput);
 		        	move(snake.get(i));
@@ -128,6 +129,7 @@ class PlayerManager implements Runnable {
 				}
 	    	}
 			
+			/*
 			for(int i=0; i<playerCount; i++)
 			{
 				for(int j=0; j<playerCount; j++)
@@ -140,6 +142,7 @@ class PlayerManager implements Runnable {
 	        	}	    
 			}
 			collisionHA(snake, apple);
+			*/
 		}
 	}
 	

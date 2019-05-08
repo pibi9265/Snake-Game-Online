@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class GamePlayerDo {
 	public static void main(String[] args) throws IOException {
-		String server = "192.168.15.1";
+		String server = "59.10.254.25";
 		int port = 4999;
 		Socket gameSocket = null;
 		
@@ -27,12 +27,12 @@ public class GamePlayerDo {
 
 class ControlInputSender implements Runnable
 {
+	//class implementing JComponent for Graphics
 	Board board = new Board();
 	private Socket gameSocket = null;
 	
 	ObjectOutputStream objectOutputStream;
 	ObjectInputStream objectInputStream;
-	Writer charWriter;
 	
 	ControlInputSender(Socket socket) throws IOException
 	{
@@ -43,14 +43,17 @@ class ControlInputSender implements Runnable
 		board.init();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void run() {
 		while(true)
 		{
 			try {
 				objectOutputStream.writeChar(board.inputControl);
+				objectOutputStream.flush();
 				
 				board.snakes.clear();
 				board.snakes.addAll((ArrayList<Snake>)objectInputStream.readObject());
+				//board.snakes = (ArrayList<Snake>)objectInputStream.readObject();
 				board.apple = (Apple)objectInputStream.readObject();
 				System.out.println(board.snakes.get(0).body.get(0).x);
 				System.out.println(board.apple.x);
