@@ -9,7 +9,10 @@ public class Snake implements Serializable{
 	public int level = 1;
 	public int moveCount = 0;
 	public boolean keysPressed = false;
+	public int testNum;
+	
 	public Snake(){
+		testNum = 0;
 		for(int i = 0;i < maxLength;i++) {
 			body.add(new Part());
 			body.get(i).x = maxLength - i -1;

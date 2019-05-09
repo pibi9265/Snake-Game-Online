@@ -48,16 +48,18 @@ class ControlInputSender implements Runnable
 		while(true)
 		{
 			try {
+				ArrayList<Snake> temp;
 				objectOutputStream.writeChar(board.inputControl);
 				objectOutputStream.flush();
 				
 				//board.snakes.clear();
 				//board.snakes.addAll((ArrayList<Snake>)objectInputStream.readObject());
-				board.snakes = (ArrayList<Snake>)objectInputStream.readObject();
-				board.apple = (Apple)objectInputStream.readObject();
-				System.out.println(board.snakes.get(0).body.get(0).x);
-				System.out.println(board.apple.x);
+				temp = (ArrayList<Snake>)objectInputStream.readObject();
+				System.out.println(temp.get(0).body.get(0).x);
 				
+				//board.snakes = (ArrayList<Snake>)objectInputStream.readObject();
+				board.apple = (Apple)objectInputStream.readObject();
+
 				board.repaint();
 				Thread.sleep(50);
 			} catch (Exception e) {
