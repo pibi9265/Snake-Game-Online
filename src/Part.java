@@ -10,9 +10,4 @@ public class Part implements Serializable{
 	public boolean left = false;
 	public boolean down = false;
 	public boolean up = false;
-	
-	Part()
-	{
-		System.out.println("Part Created");
-	}
 }

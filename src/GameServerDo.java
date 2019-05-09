@@ -106,10 +106,10 @@ class PlayerManager implements Runnable {
 	    	{
 				try
 				{
-					System.out.println(snake.get(0).body.get(0).x);
 					objectOutputStreams[i].writeObject(snake);
 					objectOutputStreams[i].writeObject(apple);
-					objectOutputStreams[i].flush();
+					objectOutputStreams[i].reset();
+					//objectOutputStreams[i].flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -122,11 +122,12 @@ class PlayerManager implements Runnable {
 					
 		    		setDirection(snake.get(i), dirInput);
 		        	move(snake.get(i));
-		        	shiftDir(snake.get(i));    	
+		        	shiftDir(snake.get(i));
 				} catch (IOException e) {
 					e.printStackTrace(); 
 				}
 	    	}
+			
 			
 			for(int i=0; i<playerCount; i++)
 			{
@@ -240,6 +241,7 @@ class PlayerManager implements Runnable {
 	private boolean collisionSA(Snake s, Apple a){
 		for(int i = 0;i < s.maxLength;i++) {
 			if((a.x==s.body.get(i).x)&&(a.y==s.body.get(i).y)) {
+				System.out.println("Collided");
 				return true;
 			}
 		}
@@ -264,24 +266,25 @@ class PlayerManager implements Runnable {
 				s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
 				s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
 				s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
+				
+				while(true){
+					a.x = random.nextInt(49);
+					a.y = random.nextInt(49);
+					
+					for(int j=0; j<snakes.size(); j++)
+					{
+						if(collisionSA(snakes.get(j), a)){
+							continue;
+						}
+					}
+					break;
+				}
+				
 				if(s.maxLength > 10)
 				{
 					s.updateLevel();
 				}
 			}
-		}
-		
-		while(true){
-			a.x = random.nextInt(49);
-			a.y = random.nextInt(49);
-			
-			for(int i=0; i<snakes.size(); i++)
-			{
-				if(collisionSA(snakes.get(i), a)){
-					continue;
-				}
-			}
-			break;
 		}
 	}
 }

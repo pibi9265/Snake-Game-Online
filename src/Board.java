@@ -5,6 +5,8 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,20 +20,22 @@ public class Board extends JComponent implements KeyListener{
 	public ArrayList<Snake> snakes = new ArrayList<Snake>();
 	public Apple apple = null;
 	public char inputControl = 'R';
-	
 	JFrame frame;
 	
-	public void init () {
+	public Board()
+	{
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(0,0,weight+(grid/2),height+(grid*2));
 		
 		frame.getContentPane().add(this);
+		frame.addKeyListener(this);
+		
 		frame.setResizable(false);
 		frame.setVisible(true);
 		frame.requestFocus();
 	}
-	
+		
 	public void paint (Graphics g) {
 		if(!snakes.isEmpty())
 		{
@@ -78,5 +82,5 @@ public class Board extends JComponent implements KeyListener{
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-	}	
+	}
 }
