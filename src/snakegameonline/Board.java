@@ -1,15 +1,21 @@
+package snakegameonline;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.Serializable;
+
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-
-import org.w3c.dom.events.Event;
-
 import java.util.Random;
 
+import snakegameonline.Snake;
+import snakegameonline.Apple;
+
 public class Board extends JComponent implements KeyListener{
+	private static final long serialVersionUID = 1L;
+
 	private int weight = 800;
 	private int height = 800;
 	private Snake snake = new Snake(10, 10);
@@ -32,20 +38,12 @@ public class Board extends JComponent implements KeyListener{
 		try {
 			while(true) {
 				Thread.sleep(50);
-				if(snake.moveCount == 2 - snake.level)
-				{
-					snake.keysPressed = false;
-					move(snake);
-					repaint();
-					shiftDir(snake);
-					collisionHB(snake, snake);
-					collisionHA(snake, apple);
-					snake.moveCount = 0;
-				}
-				else
-				{
-					snake.moveCount++;
-				}
+				snake.keysPressed = false;
+				move(snake);
+				repaint();
+				shiftDir(snake);
+				collisionHB(snake, snake);
+				collisionHA(snake, apple);
 			}
 		}
 		catch(InterruptedException e){
@@ -151,10 +149,6 @@ public class Board extends JComponent implements KeyListener{
 				if(!collisionSA(snake, apple)){
 					break;
 				}
-			}
-			if(s.maxLength > 10)
-			{
-				s.updateLevel();
 			}
 		}
 	}

@@ -1,3 +1,5 @@
+package snakegameonline;
+
 public class Apple{
 	public int x = 0;
 	public int y = 0;
