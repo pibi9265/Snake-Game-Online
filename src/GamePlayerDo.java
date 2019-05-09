@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class GamePlayerDo {
 	public static void main(String[] args) throws IOException {
-		String server = "59.10.254.25";
+		String server = "121.131.169.41";
 		int port = 4999;
 		Socket gameSocket = null;
 		
@@ -51,9 +51,9 @@ class ControlInputSender implements Runnable
 				objectOutputStream.writeChar(board.inputControl);
 				objectOutputStream.flush();
 				
-				board.snakes.clear();
-				board.snakes.addAll((ArrayList<Snake>)objectInputStream.readObject());
-				//board.snakes = (ArrayList<Snake>)objectInputStream.readObject();
+				//board.snakes.clear();
+				//board.snakes.addAll((ArrayList<Snake>)objectInputStream.readObject());
+				board.snakes = (ArrayList<Snake>)objectInputStream.readObject();
 				board.apple = (Apple)objectInputStream.readObject();
 				System.out.println(board.snakes.get(0).body.get(0).x);
 				System.out.println(board.apple.x);
