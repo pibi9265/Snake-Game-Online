@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.Serializable;
-
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import java.util.Random;

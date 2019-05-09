@@ -1,5 +1,3 @@
-package snakegameonline;
-
 import snakegameonline.Board;
 
 public class Main {
