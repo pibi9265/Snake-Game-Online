@@ -108,7 +108,6 @@ class PlayerManager implements Runnable {
 				{
 					System.out.println(snake.get(0).body.get(0).x);
 					objectOutputStreams[i].writeObject(snake);
-					objectOutputStreams[i].flush();
 					objectOutputStreams[i].writeObject(apple);
 					objectOutputStreams[i].flush();
 				} catch (IOException e) {
@@ -129,7 +128,6 @@ class PlayerManager implements Runnable {
 				}
 	    	}
 			
-			/*
 			for(int i=0; i<playerCount; i++)
 			{
 				for(int j=0; j<playerCount; j++)
@@ -142,7 +140,6 @@ class PlayerManager implements Runnable {
 	        	}	    
 			}
 			collisionHA(snake, apple);
-			*/
 		}
 	}
 	
