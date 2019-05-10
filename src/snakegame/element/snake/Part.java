@@ -1,4 +1,4 @@
-package snakegame;
+package snakegame.element.snake;
 
 public class Part{
 	public int x = 0;

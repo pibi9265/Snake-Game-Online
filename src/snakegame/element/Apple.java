@@ -1,4 +1,4 @@
-package snakegame;
+package snakegame.element;
 
 public class Apple{
 	public int x = 0;

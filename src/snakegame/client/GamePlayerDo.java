@@ -1,10 +1,10 @@
 package snakegame.client;
 
-import snakegame.Board;
+import snakegame.client.PlayerFrame;
 
 public class GamePlayerDo{
     public static void main(String[] args) {
-		Board board = new Board();
-		board.init();
+		PlayerFrame frame = new PlayerFrame();
+		frame.init();
 	}
 }
