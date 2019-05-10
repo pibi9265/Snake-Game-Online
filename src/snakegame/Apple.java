@@ -1,4 +1,4 @@
-package snakegameonline;
+package snakegame;
 
 public class Apple{
 	public int x = 0;

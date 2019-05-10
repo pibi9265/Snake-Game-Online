@@ -1,8 +1,8 @@
-package snakegameonline;
+package snakegame;
 
 import java.util.ArrayList;
 
-import snakegameonline.Part;
+import snakegame.Part;
 
 public class Snake{
 	public ArrayList<Part> body = new ArrayList<Part>();

@@ -1,4 +1,4 @@
 Manifest-Version: 0.1
-Class-Path: snakegameonline.jar
+Class-Path: snakegame.jar
 Main-Class: Main
 

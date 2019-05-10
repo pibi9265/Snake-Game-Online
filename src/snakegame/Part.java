@@ -1,4 +1,4 @@
-package snakegameonline;
+package snakegame;
 
 public class Part{
 	public int x = 0;

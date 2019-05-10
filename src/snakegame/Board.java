@@ -1,4 +1,4 @@
-package snakegameonline;
+package snakegame;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,8 +8,8 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import java.util.Random;
 
-import snakegameonline.Snake;
-import snakegameonline.Apple;
+import snakegame.Snake;
+import snakegame.Apple;
 
 public class Board extends JComponent implements KeyListener{
 	private static final long serialVersionUID = 1L;
