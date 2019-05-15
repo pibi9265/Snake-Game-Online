@@ -11,23 +11,20 @@ import snakegame.element.Apple;
 import snakegame.element.Board;
 
 public class GameWindow implements KeyListener{
-    JFrame gameFrame;
-    StartWindow StartWindow;
-    GameComponent gameComponent;
-    Snake snake;
-    Apple apple;
+    private JFrame gameFrame;
+    private StartWindow StartWindow;
+    private GameComponent gameComponent;
+    public Snake snake;
+    public Apple apple;
 
     public GameWindow(StartWindow StartWindow){
-        snake = new Snake(2, 2); //debug
-        apple = new Apple(10, 10); //debug
-
         this.StartWindow = StartWindow;
 
         GameComponent gameComponent = new GameComponent();
 
         gameFrame = new JFrame();
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        gameFrame.setSize(Board.height, Board.height);
+        gameFrame.setSize(Board.width, Board.height);
         gameFrame.setResizable(false);
         
         gameComponent = new GameComponent();
@@ -39,7 +36,11 @@ public class GameWindow implements KeyListener{
 
     JFrame getFrame(){
         return gameFrame;
-    }
+	}
+	
+	public void setPaintStatus(boolean paintStatus){
+		gameComponent.paintStatus = paintStatus;
+	}
 
     public void repaint(){
         gameComponent.repaint();
@@ -98,6 +99,5 @@ public class GameWindow implements KeyListener{
 			}
 			snake.keysPressed = true;
 		}
-	}
     */
 }

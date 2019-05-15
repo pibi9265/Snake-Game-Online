@@ -35,11 +35,11 @@ public class GameServerDo implements Runnable{
     private void move(Snake snake) {
 		for(int i = 0;i < snake.maxLength;i++) {
 			snake.body.get(i).x += snake.body.get(i).dx;
-			if(snake.body.get(i).x > (Board.weight/Board.grid) - 1) {
+			if(snake.body.get(i).x > (Board.width/Board.grid) - 1) {
 				snake.body.get(i).x = 0;
 			}
 			else if(snake.body.get(i).x < 0) {
-				snake.body.get(i).x = (Board.weight/Board.grid) - 1;
+				snake.body.get(i).x = (Board.width/Board.grid) - 1;
 			}
 			snake.body.get(i).y += snake.body.get(i).dy;
 			if(snake.body.get(i).y > (Board.height/Board.grid) - 1) {

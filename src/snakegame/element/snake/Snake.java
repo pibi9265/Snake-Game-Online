@@ -1,10 +1,13 @@
 package snakegame.element.snake;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import snakegame.element.snake.Part;
 
-public class Snake{
+public class Snake implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	public ArrayList<Part> body = new ArrayList<Part>();
 	public int maxLength = 4;
 	public boolean keysPressed = false;

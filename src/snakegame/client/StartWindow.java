@@ -20,15 +20,15 @@ public class StartWindow implements ActionListener {
     private GameWindow gameWindow;
     private String server = "127.0.0.1";
     private int port = 49152;
-    Socket socket;
-    //ClientReader clientReader;
+    private Socket socket;
+    //private ClientReader clientReader;
 
     public StartWindow() {
-        //clientReader = new ClientReader();
+        //clientReader = new ClientReader(gameWindow);
 
         startFrame = new JFrame();
         startFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        startFrame.setSize(Board.startFrameHeight, Board.startFrameWeight);
+        startFrame.setSize(Board.startFrameWidth, Board.startFrameHeight);
         startFrame.setResizable(false);
 
         JPanel panel = new JPanel();
@@ -57,22 +57,22 @@ public class StartWindow implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        //while (true) {
-            //try {
-                //socket = new Socket(server, port);
-                ////ClientReader.setSocket(socket);
-                ////new Thread(clientReader).start();
-                //startFrame.setVisible(false);
+        while (true) {
+            try {
+                socket = new Socket(server, port);
+                //clientReader.setSocket(socket);
+                //new Thread(clientReader).start();
+                startFrame.setVisible(false);
                 gameWindow.getFrame().setVisible(true);
                 gameWindow.getFrame().requestFocus();
-                //break;
-            //} catch (BindException bindExcption) {
-            //    bindExcption.printStackTrace();
-            //} catch (UnknownHostException unknownHostException) {
-            //    unknownHostException.printStackTrace();
-            //} catch (IOException ioException) {
-            //    ioException.printStackTrace();
-            //}
-        //}
+                break;
+            } catch(BindException bindException){
+                bindException.printStackTrace();
+            } catch (UnknownHostException unknownHostException) {
+                unknownHostException.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
     }
 }
