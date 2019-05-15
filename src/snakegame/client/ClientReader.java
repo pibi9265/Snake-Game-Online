@@ -1,14 +1,17 @@
 package snakegame.client;
 
-import snakegame.client.PlayerFrame;
+import java.net.Socket;
 
 public class ClientReader implements Runnable{
-    PlayerFrame frame;
+    Socket socket;
 
-    ClientReader(PlayerFrame frame){
-        this.frame = frame;
+    ClientReader(){
+        socket = null;
     }
-    public void run(){
-        frame.repaint();
+
+    public void run(){}
+
+    public void setSocket(Socket socket){
+        this.socket = socket;
     }
 }
