@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 
 import snakegame.client.StartWindow;
 import snakegame.client.GameComponent;
+import snakegame.client.ClientSender;
 import snakegame.element.snake.*;
 import snakegame.element.Apple;
 import snakegame.element.Board;
@@ -13,14 +14,15 @@ import snakegame.element.Board;
 public class GameWindow implements KeyListener{
     private JFrame gameFrame;
     private StartWindow StartWindow;
-    private GameComponent gameComponent;
+	private GameComponent gameComponent;
+	private ClientSender clientSender;
     public Snake snake;
-    public Apple apple;
+	public Apple apple;
 
     public GameWindow(StartWindow StartWindow){
-        this.StartWindow = StartWindow;
-
-        GameComponent gameComponent = new GameComponent();
+		this.StartWindow = StartWindow;
+		
+		clientSender = new ClientSender();
 
         gameFrame = new JFrame();
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,22 +46,27 @@ public class GameWindow implements KeyListener{
 
     public void repaint(){
         gameComponent.repaint();
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-        //sender
-    }
-
+	}
+	
     @Override
     public void keyPressed(KeyEvent e) {
-        //sender
-    }
-
+		if(e.getKeyCode()==KeyEvent.VK_RIGHT) {
+			clientSender.sending('R');
+		}
+		else if(e.getKeyCode()==KeyEvent.VK_LEFT) {
+			clientSender.sending('L');
+		}
+		else if(e.getKeyCode()==KeyEvent.VK_DOWN) {
+			clientSender.sending('D');
+		}
+		else if(e.getKeyCode()==KeyEvent.VK_UP) {
+			clientSender.sending('U');
+		}
+	}
+	@Override
+	public void keyTyped(KeyEvent e) {}
     @Override
-    public void keyReleased(KeyEvent e) {
-        //sender
-    }
+    public void keyReleased(KeyEvent e) {}
 
     /*
     	public void keyPressed(KeyEvent e) {

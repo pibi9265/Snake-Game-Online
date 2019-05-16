@@ -10,7 +10,6 @@ public class Snake implements Serializable{
 	
 	public ArrayList<Part> body = new ArrayList<Part>();
 	public int maxLength = 4;
-	public boolean keysPressed = false;
 	public Snake(){
 		for(int i = 0;i < maxLength;i++) {
 			body.add(new Part());
