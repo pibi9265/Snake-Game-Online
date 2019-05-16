@@ -13,24 +13,22 @@ import snakegame.Board;
 
 public class GameWindow implements KeyListener{
     private JFrame gameFrame;
-    private StartWindow StartWindow;
+    private StartWindow startWindow;
 	private GameComponent gameComponent;
-	private ClientSender clientSender;
-    public Snake snake;
-	public Apple apple;
+    //public Snake snake;
+	//public Apple apple;
 
-    public GameWindow(StartWindow StartWindow){
-		this.StartWindow = StartWindow;
+    public GameWindow(StartWindow startWindow){
+		this.startWindow = startWindow;
 		
-		clientSender = new ClientSender();
+		startWindow.clientSender = new ClientSender();
 
         gameFrame = new JFrame();
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        gameFrame.setSize(Board.width, Board.height);
+        gameFrame.setSize(Board.width+(Board.grid/2), Board.height+(Board.grid*2));
         gameFrame.setResizable(false);
         
         gameComponent = new GameComponent();
-        gameComponent.init(snake, apple);
         gameFrame.getContentPane().add(gameComponent);
         
 		gameFrame.addKeyListener(this);
@@ -40,71 +38,31 @@ public class GameWindow implements KeyListener{
         return gameFrame;
 	}
 	
-	public void setPaintStatus(boolean paintStatus){
-		gameComponent.paintStatus = paintStatus;
+	public void setStart(boolean start){
+		gameComponent.start = start;
 	}
 
-    public void repaint(){
-        gameComponent.repaint();
+    public void repaintGameWindow(Snake snake, Apple apple){
+        gameComponent.paintGameWindow(snake, apple);
 	}
 	
     @Override
     public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode()==KeyEvent.VK_RIGHT) {
-			clientSender.sending('R');
+			startWindow.clientSender.sending('R');
 		}
 		else if(e.getKeyCode()==KeyEvent.VK_LEFT) {
-			clientSender.sending('L');
+			startWindow.clientSender.sending('L');
 		}
 		else if(e.getKeyCode()==KeyEvent.VK_DOWN) {
-			clientSender.sending('D');
+			startWindow.clientSender.sending('D');
 		}
 		else if(e.getKeyCode()==KeyEvent.VK_UP) {
-			clientSender.sending('U');
+			startWindow.clientSender.sending('U');
 		}
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {}
     @Override
     public void keyReleased(KeyEvent e) {}
-
-    /*
-    	public void keyPressed(KeyEvent e) {
-		if(!snake.keysPressed)
-		{
-			if((e.getKeyCode()==KeyEvent.VK_RIGHT)&&(!snake.body.get(0).left)) {
-			snake.body.get(0).dx = 1;
-			snake.body.get(0).dy = 0;
-			snake.body.get(0).right = true;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = false;
-			}
-			else if((e.getKeyCode()==KeyEvent.VK_LEFT)&&(!snake.body.get(0).right)) {
-				snake.body.get(0).dx = -1;
-				snake.body.get(0).dy = 0;
-				snake.body.get(0).right = false;
-				snake.body.get(0).left = true;
-				snake.body.get(0).down = false;
-				snake.body.get(0).up = false;
-			}
-			else if((e.getKeyCode()==KeyEvent.VK_DOWN)&&(!snake.body.get(0).up)) {
-				snake.body.get(0).dx = 0;
-				snake.body.get(0).dy = 1;
-				snake.body.get(0).right = false;
-				snake.body.get(0).left = false;
-				snake.body.get(0).down = true;
-				snake.body.get(0).up = false;
-			}
-			else if((e.getKeyCode()==KeyEvent.VK_UP)&&(!snake.body.get(0).down)) {
-				snake.body.get(0).dx = 0;
-				snake.body.get(0).dy = -1;
-				snake.body.get(0).right = false;
-				snake.body.get(0).left = false;
-				snake.body.get(0).down = false;
-				snake.body.get(0).up = true;
-			}
-			snake.keysPressed = true;
-		}
-    */
 }

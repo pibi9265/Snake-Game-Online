@@ -13,7 +13,7 @@ import snakegame.Part;
 import snakegame.Apple;
 import snakegame.Board;
 
-public class ServerWindow {
+public class ServerWindow implements Runnable{
 	private ServerSocket serverSocket;
 	private Socket playerSocket;
 	private ServerReader serverReader;
@@ -22,38 +22,38 @@ public class ServerWindow {
 	private Snake snake;
 	public Apple apple;
 	private Random random;
+	private boolean stop;
 
 	public ServerWindow() {
-		try {
-			serverSocket = new ServerSocket(49152);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		playerSocket = null;
+		random = new Random();
+		snake = new Snake(10, 10);
+		apple = new Apple(20, 20);
 
 		serverReader = new ServerReader(this, snake);
 		serverSender = new ServerSender(this, snake);
 
-		snake = new Snake(10, 10);
-		apple = new Apple(20, 20);
-		random = new Random();
+		serverSocket = null;
+		playerSocket = null;
 
 		serverFrame = new JFrame();
 		serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		serverFrame.setSize(200, 100);
+		serverFrame.setSize(400, 200);
 		serverFrame.setResizable(false);
-
 		serverFrame.setVisible(true);
 
-		startServer();
+		stop = false;
+
+		new Thread(this).start();
 	}
 
-	public void startServer() {
+	public void run(){
 		try {
+			serverSocket = new ServerSocket(49152);
 			playerSocket = serverSocket.accept();
+			serverSender.setSocket(playerSocket);
 			serverReader.setSocket(playerSocket);
 			new Thread(serverReader).start();
-			while (true) {
+			while (!stop) {
 				Thread.sleep(50);
 				move(snake);
 				shiftDir(snake);
@@ -67,6 +67,10 @@ public class ServerWindow {
 			e.printStackTrace();
 		}
 	}
+
+	public void threadStop(){
+        stop = true;
+    }
 
   private void move(Snake snake) {
 		for(int i = 0;i < snake.maxLength;i++) {

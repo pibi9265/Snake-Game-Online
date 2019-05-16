@@ -10,5 +10,5 @@ public class Board{
     public static int width = 800;
 	public static int height = 800;
 	public static int grid = 16;
-	public static int playerCount = 4;
+	public static int maxPlayer = 4;
 }

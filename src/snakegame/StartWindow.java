@@ -13,6 +13,7 @@ import java.io.IOException;
 import snakegame.Board;
 import snakegame.GameWindow;
 import snakegame.ClientReader;
+import snakegame.ClientSender;
 
 public class StartWindow implements ActionListener {
     private JFrame startFrame;
@@ -21,12 +22,16 @@ public class StartWindow implements ActionListener {
     private int port = 49152;
     private Socket socket;
     private ClientReader clientReader;
+    public ClientSender clientSender;
 
     private JTextArea ipTextArea;
     private JTextArea portTextArea;
 
     public StartWindow() {
+        gameWindow = new GameWindow(this);
+
         clientReader = new ClientReader(gameWindow);
+        clientSender = new ClientSender();
 
         socket = null;
 
@@ -52,8 +57,6 @@ public class StartWindow implements ActionListener {
         portTextArea.setRows(Board.portTextAreaRows);
         panel.add(portTextArea);
 
-        gameWindow = new GameWindow(this);
-
         startFrame.setVisible(true);
         startFrame.requestFocus();
     }
@@ -68,6 +71,7 @@ public class StartWindow implements ActionListener {
             server = ipTextArea.getText();
             port = Integer.parseInt(portTextArea.getText());
             socket = new Socket(server, port);
+            clientSender.setSocket(socket);
             clientReader.setSocket(socket);
             new Thread(clientReader).start();
             startFrame.setVisible(false);

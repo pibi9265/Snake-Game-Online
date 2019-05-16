@@ -14,16 +14,17 @@ public class GameComponent extends JComponent{
     private Snake snake;
     private Apple apple;
 
-    public boolean paintStatus = false;
+    public boolean start = false;
 
-    public void init(Snake snake, Apple apple){
+    public void paintGameWindow(Snake snake, Apple apple){
         this.snake = snake;
         this.apple = apple;
+        repaint();
     }
 
     @Override
     public void paint (Graphics g) {
-        if(paintStatus){
+        if(start){
 	    	g.setColor(Color.black);
 	    	for(int i = 0;i < snake.maxLength;i++) {
 	    		g.drawRect(snake.body.get(i).x*Board.grid, snake.body.get(i).y*Board.grid, Board.grid , Board.grid);
