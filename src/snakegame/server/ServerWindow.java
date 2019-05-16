@@ -50,9 +50,8 @@ public class ServerWindow {
 	public void startServer() {
 		try {
 			playerSocket = serverSocket.accept();
-			//serverReader.setSocket(playerSocket);
+			serverReader.setSocket(playerSocket);
 			new Thread(serverReader).start();
-			serverSender.setSocket(playerSocket);
 			while (true) {
 				Thread.sleep(50);
 				move(snake);

@@ -30,7 +30,6 @@ public class ServerReader implements Runnable {
     @Override
     public void run() {
         while(!stop){
-            System.out.println("dDD");
             try {
                 //objectInputStream = new ObjectInputStream(socket.getInputStream());
                 dir = 'n';

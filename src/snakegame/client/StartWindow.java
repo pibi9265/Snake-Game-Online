@@ -63,7 +63,7 @@ public class StartWindow implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
         try {
             socket = new Socket(server, port);
-            //clientReader.setSocket(socket);
+            clientReader.setSocket(socket);
             new Thread(clientReader).start();
             startFrame.setVisible(false);
             gameWindow.getFrame().setVisible(true);

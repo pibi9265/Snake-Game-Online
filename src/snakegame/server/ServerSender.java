@@ -26,7 +26,7 @@ public class ServerSender{
             objectOutputStream.writeObject(snake);
             objectOutputStream.writeObject(serverWindow.apple);
             objectOutputStream.flush();
-            //objectOutputStream.reset();
+            objectOutputStream.reset();
         } catch (IOException e) {
             e.printStackTrace();
         }
