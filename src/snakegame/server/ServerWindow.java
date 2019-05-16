@@ -43,12 +43,14 @@ public class ServerWindow {
 		serverFrame.setResizable(false);
 
 		serverFrame.setVisible(true);
+
+		startServer();
 	}
 
 	public void startServer() {
 		try {
 			playerSocket = serverSocket.accept();
-			serverReader.setSocket(playerSocket);
+			//serverReader.setSocket(playerSocket);
 			new Thread(serverReader).start();
 			serverSender.setSocket(playerSocket);
 			while (true) {

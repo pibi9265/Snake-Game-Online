@@ -1,5 +1,6 @@
 package snakegame.server;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -10,21 +11,29 @@ import snakegame.element.snake.*;
 public class ServerReader implements Runnable {
     private ServerWindow serverWindow;
     private Snake snake;
+    //private Socket socket;
+    BufferedInputStream bufferedInputStream;
     private ObjectInputStream objectInputStream;
-    boolean stop;
+    private boolean stop;
+    private char dir;
 
     public ServerReader(ServerWindow serverWindow, Snake snake) {
         this.serverWindow = serverWindow;
         this.snake = snake;
+        //socket = null;
+        bufferedInputStream = null;
         objectInputStream = null;
         stop = false;
+        dir = 'n';
     }
 
     @Override
     public void run() {
         while(!stop){
+            System.out.println("dDD");
             try {
-                char dir;
+                //objectInputStream = new ObjectInputStream(socket.getInputStream());
+                dir = 'n';
                 dir = objectInputStream.readChar();
                 serverWindow.setDir(snake, dir);
             } catch (IOException e) {
@@ -34,8 +43,10 @@ public class ServerReader implements Runnable {
     }
 
     public void setSocket(Socket socket) {
+        //this.socket = socket;
         try {
-            objectInputStream = new ObjectInputStream(socket.getInputStream());
+            bufferedInputStream = new BufferedInputStream(socket.getInputStream());
+            objectInputStream = new ObjectInputStream(bufferedInputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
