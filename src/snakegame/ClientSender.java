@@ -13,8 +13,10 @@ public class ClientSender {
 
     public void sending(char dir){
         try {
-            objectOutputStream.writeChar(dir);
-            objectOutputStream.flush();
+                if(objectOutputStream != null){
+                objectOutputStream.writeChar(dir);
+                objectOutputStream.flush();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
