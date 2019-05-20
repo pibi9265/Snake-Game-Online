@@ -20,9 +20,11 @@ public class ServerSender{
 
     public void sending(){
         try {
-            objectOutputStream.writeObject(snake);
-            objectOutputStream.writeObject(serverWindow.apple);
-            objectOutputStream.reset();
+            if(objectOutputStream != null){
+                objectOutputStream.writeObject(snake);
+                objectOutputStream.writeObject(serverWindow.apple);
+                objectOutputStream.reset();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
