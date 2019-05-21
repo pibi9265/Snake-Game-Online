@@ -1,6 +1,7 @@
 package snakegame;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
@@ -22,16 +23,13 @@ public class ClientReader implements Runnable {
     public void run() {
         while(!stop){
             try {
-                Thread.sleep(5);
-                Snake snake = (Snake)objectInputStream.readObject();
+                ArrayList<Snake> snake = (ArrayList<Snake>)objectInputStream.readObject();
                 Apple apple = (Apple)objectInputStream.readObject();
                 gameWindow.setStart(true);
                 gameWindow.repaintGameWindow(snake, apple);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }

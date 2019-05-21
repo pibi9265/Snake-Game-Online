@@ -24,4 +24,22 @@ public class Snake implements Serializable{
 			body.get(i).y = y;
 		}
 	}
+	
+	public Snake(int player) {
+		int x = 0, y = 0;
+		if(player == 0)	{
+			x = 10;
+			y = 10;
+		}
+		else if(player == 1) {
+			x = 700;
+			y = 700;
+		}
+		
+		for(int i = 0;i < maxLength;i++) {
+			body.add(new Part());
+			body.get(i).x = maxLength - i - 1 + x;
+			body.get(i).y = y;
+		}
+	}
 }
