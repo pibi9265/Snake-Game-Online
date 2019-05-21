@@ -32,11 +32,11 @@ public class Snake implements Serializable{
 			y = 10;
 		}
 		else if(player == 1) {
-			x = 700;
-			y = 700;
+			x = 50;
+			y = 50;
 		}
 		
-		for(int i = 0;i < maxLength;i++) {
+		for(int i = 0; i < maxLength;i++) {
 			body.add(new Part());
 			body.get(i).x = maxLength - i - 1 + x;
 			body.get(i).y = y;

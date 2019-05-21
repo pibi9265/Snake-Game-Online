@@ -94,7 +94,7 @@ public class ServerWindow implements Runnable{
 				{
 					serverSenders.get(i).sending();
 				}
-				Thread.sleep(5);
+				Thread.sleep(50);
 			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
