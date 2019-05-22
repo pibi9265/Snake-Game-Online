@@ -6,7 +6,8 @@ import java.io.ObjectOutputStream;
 
 public class ClientSender {
     private ObjectOutputStream objectOutputStream;
-
+    private char dir;
+    
     public ClientSender() {
         objectOutputStream = null;
     }

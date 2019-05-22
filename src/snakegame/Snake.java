@@ -32,8 +32,8 @@ public class Snake implements Serializable{
 			y = 10;
 		}
 		else if(player == 1) {
-			x = 50;
-			y = 50;
+			x = 18;
+			y = 18;
 		}
 		
 		for(int i = 0; i < maxLength;i++) {

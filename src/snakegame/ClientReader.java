@@ -25,6 +25,7 @@ public class ClientReader implements Runnable {
             try {
                 ArrayList<Snake> snake = (ArrayList<Snake>)objectInputStream.readObject();
                 Apple apple = (Apple)objectInputStream.readObject();
+                objectInputStream.reset();
                 gameWindow.setStart(true);
                 gameWindow.repaintGameWindow(snake, apple);
             } catch (ClassNotFoundException e) {
