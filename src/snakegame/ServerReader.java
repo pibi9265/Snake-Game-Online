@@ -11,10 +11,19 @@ public class ServerReader implements Runnable {
     private ObjectInputStream objectInputStream;
     private boolean stop;
     private char dir;
-    
-    public ServerReader() {
+ 
+    public ServerReader(int playerNum) {
         objectInputStream = null;
         stop = false;
+        
+        if(playerNum == 0)
+        {
+        	dir = 'R';
+        }
+        else if(playerNum == 1)
+        {
+        	dir = 'L';
+        }
     }
 
     @Override
@@ -22,6 +31,7 @@ public class ServerReader implements Runnable {
         while(!stop){
             try {
                 dir = objectInputStream.readChar();
+                
             } catch (IOException e) {
                 e.printStackTrace();
             }

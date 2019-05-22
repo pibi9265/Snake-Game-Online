@@ -13,18 +13,23 @@ public class ClientReader implements Runnable {
     private ObjectInputStream objectInputStream;
     private GameWindow gameWindow;
     private boolean stop;
-
+    ArrayList<Snake> snake;
+    Apple apple;
+    
     public ClientReader(GameWindow gameWindow) {
         this.gameWindow = gameWindow;
         objectInputStream = null;
         stop = false;
+        snake = null;
+        apple = null;
+        
     }
 
     public void run() {
         while(!stop){
             try {
-                ArrayList<Snake> snake = (ArrayList<Snake>)objectInputStream.readObject();
-                Apple apple = (Apple)objectInputStream.readObject();
+                snake = (ArrayList<Snake>)objectInputStream.readObject();
+                apple = (Apple)objectInputStream.readObject();
                 objectInputStream.reset();
                 gameWindow.setStart(true);
                 gameWindow.repaintGameWindow(snake, apple);

@@ -16,7 +16,7 @@ public class ClientSender {
         try {
                 if(objectOutputStream != null){
                 objectOutputStream.writeChar(dir);
-                objectOutputStream.flush();
+                objectOutputStream.reset();
             }
         } catch (IOException e) {
             e.printStackTrace();
