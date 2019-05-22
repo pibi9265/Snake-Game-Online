@@ -1,0 +1,13 @@
+src폴더
+javac -d ..\bin\ snakegame\*.java
+
+bin폴더
+java snakegame.ServerDo
+java snakegame.ClientDo
+
+manifest파일 변경하고
+bin폴더
+jar -cvfm server.jar ..\META-INF\manifest.mf .\snakegame\
+jar -cvfm client.jar ..\META-INF\manifest.mf .\snakegame\
+
+client의 snake와 apple을 어떻게 밖으로 빼야함..

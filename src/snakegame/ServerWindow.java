@@ -3,6 +3,7 @@ package snakegame;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.JFrame;
 
@@ -16,6 +17,7 @@ import snakegame.Board;
 public class ServerWindow implements Runnable{
 	private ServerSocket serverSocket;
 	private Socket playerSocket;
+	private ArrayList playerList;
 	private ServerReader serverReader;
 	private ServerSender serverSender;
 	private JFrame serverFrame;
@@ -34,6 +36,7 @@ public class ServerWindow implements Runnable{
 
 		serverSocket = null;
 		playerSocket = null;
+		playerList = new ArrayList<Socket>(Board.maxPlayer);
 
 		serverFrame = new JFrame();
 		serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
