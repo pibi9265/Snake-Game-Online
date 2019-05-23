@@ -13,4 +13,6 @@ public class Board{
 	public static int height = 800;
 	public static int grid = 16;
 	public static int maxPlayer = 4;
+	public static String DEFAULT_ADDRESS = "127.0.0.1";
+	public static int DEFAULT_PORT = 49152;
 }

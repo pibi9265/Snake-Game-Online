@@ -32,7 +32,7 @@ public class Snake implements Serializable{
 			y = 10;
 		}
 		else if(player == 1) {
-			x = 500;
+			x = 18;
 			y = 10;
 		}
 		

@@ -61,7 +61,7 @@ public class ServerWindow implements Runnable{
 				snake.add(new Snake(playerCount));
 				serverSenders.add(new ServerSender(snake, apple));
 				serverSenders.get(playerCount).setSocket(playerSockets.get(playerCount));
-				serverReaders.add(new ServerReader());
+				serverReaders.add(new ServerReader(playerCount));
 				serverReaders.get(playerCount).setSocket(playerSockets.get(playerCount));
 				playerCount++;
 			}
