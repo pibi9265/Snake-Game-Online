@@ -2,6 +2,7 @@ package snakegame;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -15,15 +16,16 @@ import snakegame.Board;
 
 public class GameWindow implements KeyListener{
     private JFrame gameFrame;
-    private StartWindow startWindow;
+    private JFrame startFrame;
 	private GameComponent gameComponent;
+	private ClientSender clientSender;
     //public Snake snake;
 	//public Apple apple;
 
-    public GameWindow(StartWindow startWindow){
-		this.startWindow = startWindow;
+    public GameWindow(JFrame startFrame, Socket socket){
+		this.startFrame = startFrame;
 		
-		startWindow.clientSender = new ClientSender();
+		clientSender = new ClientSender(Socket socket);
 
         gameFrame = new JFrame();
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
