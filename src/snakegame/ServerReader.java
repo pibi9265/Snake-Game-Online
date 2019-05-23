@@ -10,7 +10,7 @@ import snakegame.Snake;
 public class ServerReader implements Runnable {
     private ObjectInputStream objectInputStream;
     private boolean stop;
-    private char dir;
+    private char direction;
  
     public ServerReader(int playerNum) {
         objectInputStream = null;
@@ -18,19 +18,21 @@ public class ServerReader implements Runnable {
         
         if(playerNum == 0)
         {
-        	dir = 'R';
+        	direction = 'R';
         }
         else if(playerNum == 1)
         {
-        	dir = 'L';
+        	direction = 'L';
         }
     }
 
     @Override
     public void run() {
+    	char tempdir = 0;
         while(!stop){
             try {
-                dir = objectInputStream.readChar();
+                tempdir = objectInputStream.readChar();
+                direction = tempdir;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -51,6 +53,6 @@ public class ServerReader implements Runnable {
     
     public char getDirection()
     {
-    	return dir;
+    	return direction;
     }
 }
