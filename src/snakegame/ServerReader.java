@@ -31,7 +31,6 @@ public class ServerReader implements Runnable {
         while(!stop){
             try {
                 dir = objectInputStream.readChar();
-                
             } catch (IOException e) {
                 e.printStackTrace();
             }
