@@ -16,16 +16,9 @@ import snakegame.Board;
 
 public class ServerWindow implements Runnable{
 	private ServerSocket serverSocket;
-<<<<<<< HEAD
-	private Socket playerSocket;
-	private ArrayList playerList;
-	private ServerReader serverReader;
-	private ServerSender serverSender;
-=======
 	private ArrayList<Socket> playerSockets;
 	private ArrayList<ServerReader> serverReaders;
 	private ArrayList<ServerSender> serverSenders;
->>>>>>> multiply_testing
 	private JFrame serverFrame;
 	private ArrayList<Snake> snake;
 	public Apple apple;
@@ -45,15 +38,9 @@ public class ServerWindow implements Runnable{
 		serverSenders = new ArrayList<ServerSender>();
 		
 		serverSocket = null;
-<<<<<<< HEAD
-		playerSocket = null;
-		playerList = new ArrayList<Socket>(Board.maxPlayer);
-
-=======
 		//playerSocket = null;
 		playerSockets = new ArrayList<Socket>();
 		
->>>>>>> multiply_testing
 		serverFrame = new JFrame();
 		serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		serverFrame.setSize(400, 200);
