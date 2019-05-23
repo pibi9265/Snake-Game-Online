@@ -8,31 +8,21 @@ import snakegame.ServerWindow;
 import snakegame.Snake;
 
 public class ServerReader implements Runnable {
-    private ServerWindow serverWindow;
-    private Snake snake;
     private ObjectInputStream objectInputStream;
     private boolean stop;
     private char dir;
-
-    public ServerReader(ServerWindow serverWindow, Snake snake) {
-        this.serverWindow = serverWindow;
-        this.snake = snake;
+    
+    public ServerReader() {
         objectInputStream = null;
         stop = false;
-        dir = 'n';
     }
 
     @Override
     public void run() {
         while(!stop){
             try {
-                Thread.sleep(5);
-                dir = 'n';
                 dir = objectInputStream.readChar();
-                serverWindow.setDir(snake, dir);
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -48,5 +38,10 @@ public class ServerReader implements Runnable {
 
     public void threadStop(){
         stop = true;
+    }
+    
+    public char getDirection()
+    {
+    	return dir;
     }
 }

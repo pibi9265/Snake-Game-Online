@@ -26,7 +26,8 @@ public class StartWindow implements ActionListener {
 
     private JTextArea ipTextArea;
     private JTextArea portTextArea;
-
+    private JTextArea playerTextArea;
+    
     public StartWindow() {
         gameWindow = new GameWindow(this);
 
@@ -57,6 +58,11 @@ public class StartWindow implements ActionListener {
         portTextArea.setRows(Board.portTextAreaRows);
         panel.add(portTextArea);
 
+        playerTextArea = new JTextArea(Integer.toString(2));
+        playerTextArea.setColumns(Board.playerTextAreaColums);
+        playerTextArea.setRows(Board.playerTextAreaRows);
+        panel.add(playerTextArea);
+        
         startFrame.setVisible(true);
         startFrame.requestFocus();
     }

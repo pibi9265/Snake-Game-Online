@@ -2,6 +2,8 @@ package snakegame;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+
 import javax.swing.JFrame;
 
 import snakegame.StartWindow;
@@ -42,8 +44,8 @@ public class GameWindow implements KeyListener{
 		gameComponent.start = start;
 	}
 
-    public void repaintGameWindow(Snake snake, Apple apple){
-        gameComponent.paintGameWindow(snake, apple);
+    public void repaintGameWindow(ArrayList<Snake> snake, Apple apple){
+        gameComponent.paintGameComponents(snake, apple);
 	}
 	
     @Override

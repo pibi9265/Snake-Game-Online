@@ -16,28 +16,44 @@ import snakegame.Board;
 
 public class ServerWindow implements Runnable{
 	private ServerSocket serverSocket;
+<<<<<<< HEAD
 	private Socket playerSocket;
 	private ArrayList playerList;
 	private ServerReader serverReader;
 	private ServerSender serverSender;
+=======
+	private ArrayList<Socket> playerSockets;
+	private ArrayList<ServerReader> serverReaders;
+	private ArrayList<ServerSender> serverSenders;
+>>>>>>> multiply_testing
 	private JFrame serverFrame;
-	private Snake snake;
+	private ArrayList<Snake> snake;
 	public Apple apple;
 	private Random random;
 	private boolean stop;
-
+	private int playerCount;
+	
 	public ServerWindow() {
 		random = new Random();
-		snake = new Snake(10, 10);
+		snake = new ArrayList<Snake>();
+		//snake = new Snake(10, 10);
 		apple = new Apple(20, 20);
 
-		serverReader = new ServerReader(this, snake);
-		serverSender = new ServerSender(this, snake);
-
+		//serverReader = new ServerReader(this, snake);
+		serverReaders = new ArrayList<ServerReader>();
+		//serverSender = new ServerSender(this, snake);
+		serverSenders = new ArrayList<ServerSender>();
+		
 		serverSocket = null;
+<<<<<<< HEAD
 		playerSocket = null;
 		playerList = new ArrayList<Socket>(Board.maxPlayer);
 
+=======
+		//playerSocket = null;
+		playerSockets = new ArrayList<Socket>();
+		
+>>>>>>> multiply_testing
 		serverFrame = new JFrame();
 		serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		serverFrame.setSize(400, 200);
@@ -45,28 +61,55 @@ public class ServerWindow implements Runnable{
 		serverFrame.setVisible(true);
 
 		stop = false;
-
+		playerCount = 0;
 		new Thread(this).start();
 	}
 
 	public void run(){
 		try {
 			serverSocket = new ServerSocket(49152);
-			playerSocket = serverSocket.accept();
-			serverSender.setSocket(playerSocket);
-			serverReader.setSocket(playerSocket);
-			new Thread(serverReader).start();
-			while (!stop) {
-				Thread.sleep(50);
-				move(snake);
-				shiftDir(snake);
-				collisionHA(snake, apple);
-				collisionHB(snake, snake);
-				serverSender.sending();
+			while(playerCount != 2) 
+			{
+				playerSockets.add(serverSocket.accept());
+				snake.add(new Snake(playerCount));
+				serverSenders.add(new ServerSender(snake, apple));
+				serverSenders.get(playerCount).setSocket(playerSockets.get(playerCount));
+				serverReaders.add(new ServerReader());
+				serverReaders.get(playerCount).setSocket(playerSockets.get(playerCount));
+				playerCount++;
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+			for(int i=0; i<playerCount; i++)
+			{
+				new Thread(serverReaders.get(i)).start();
+			}
+			
+			while (!stop) {
+				for(int i=0; i<playerCount; i++)
+		    	{
+					setDir(snake.get(i), serverReaders.get(i).getDirection());
+					move(snake.get(i));
+					shiftDir(snake.get(i));
+		    	}
+				
+				for(int i=0; i<playerCount; i++)
+				{
+					for(int j=0; j<playerCount; j++)
+		        	{
+	        			collisionHB(snake.get(i), snake.get(j));
+	        			if(i != j)
+	        			{
+	        				collisionHH(snake.get(i), snake.get(j));
+	        			}
+		        	}	    
+				}
+				collisionHA(snake, apple);
+				for(int i=0; i<playerCount; i++)
+				{
+					serverSenders.get(i).sending();
+				}
+				Thread.sleep(50);
+			}
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -176,26 +219,43 @@ public class ServerWindow implements Runnable{
 		return false;
 	}
 
-	private void collisionHA(Snake s, Apple a) {
-		if((s.body.get(0).x==a.x)&&(s.body.get(0).y==a.y)) {
-			s.body.add(new Part());
-			s.maxLength++;
-			s.body.get(s.maxLength-1).x = s.body.get(s.maxLength-2).x;
-			s.body.get(s.maxLength-1).y = s.body.get(s.maxLength-2).y;
-			s.body.get(s.maxLength-1).dx = s.body.get(s.maxLength-2).dx;
-			s.body.get(s.maxLength-1).dy = s.body.get(s.maxLength-2).dy;
-			s.body.get(s.maxLength-1).right = s.body.get(s.maxLength-2).right;
-			s.body.get(s.maxLength-1).left = s.body.get(s.maxLength-2).left;
-			s.body.get(s.maxLength-1).down = s.body.get(s.maxLength-2).down;
-			s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
-			s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
-			s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
-			while(true){
-				a.x = random.nextInt(49);
-				a.y = random.nextInt(49);
-				if(!collisionSA(snake, apple)){
+	private void collisionHA(ArrayList<Snake> snakes, Apple a) {
+		for(int i=0; i<snakes.size(); i++)
+		{
+			Snake s = snakes.get(i);
+			
+			if((s.body.get(0).x==a.x)&&(s.body.get(0).y==a.y)) {
+				s.body.add(new Part());
+				s.maxLength++;
+				s.body.get(s.maxLength-1).x = s.body.get(s.maxLength-2).x;
+				s.body.get(s.maxLength-1).y = s.body.get(s.maxLength-2).y;
+				s.body.get(s.maxLength-1).dx = s.body.get(s.maxLength-2).dx;
+				s.body.get(s.maxLength-1).dy = s.body.get(s.maxLength-2).dy;
+				s.body.get(s.maxLength-1).right = s.body.get(s.maxLength-2).right;
+				s.body.get(s.maxLength-1).left = s.body.get(s.maxLength-2).left;
+				s.body.get(s.maxLength-1).down = s.body.get(s.maxLength-2).down;
+				s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
+				s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
+				s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
+				
+				while(true){
+					a.x = random.nextInt(49);
+					a.y = random.nextInt(49);
+					
+					for(int j=0; j<snakes.size(); j++)
+					{
+						if(collisionSA(snakes.get(j), a)){
+							continue;
+						}
+					}
 					break;
 				}
+				/*
+				if(s.maxLength > 10)
+				{
+					s.updateLevel();
+				}
+				*/
 			}
 		}
 	}
