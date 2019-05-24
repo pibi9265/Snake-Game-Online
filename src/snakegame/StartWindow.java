@@ -7,7 +7,6 @@ import javax.swing.JTextArea;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -15,23 +14,18 @@ import java.io.IOException;
 
 import snakegame.Board;
 import snakegame.GameWindow;
-import snakegame.ClientReader;
-import snakegame.ClientSender;
 
 public class StartWindow implements ActionListener {
     private JFrame startFrame;
     private JTextArea ipTextArea;
     private JTextArea portTextArea;
-    private JTextArea playerTextArea;
+    //private JTextArea playerTextArea;
 
     private GameWindow gameWindow;
 
     private Socket socket;
     private String address = Board.DEFAULT_ADDRESS;
     private int port = Board.DEFAULT_PORT;
-
-    private ClientReader clientReader;
-    public ClientSender clientSender;
     
     public StartWindow() {
         // start 프레임 생성
@@ -56,14 +50,15 @@ public class StartWindow implements ActionListener {
         portTextArea.setColumns(Board.portTextAreaColumns);
         portTextArea.setRows(Board.portTextAreaRows);
         panel.add(portTextArea);
-        // player text area 생성 & panel에 추가
+        /* player text area 생성 & panel에 추가
         playerTextArea = new JTextArea(Integer.toString(2));
         playerTextArea.setColumns(Board.playerTextAreaColums);
         playerTextArea.setRows(Board.playerTextAreaRows);
         panel.add(playerTextArea);
+        */
 
         // game 창 생성
-        gameWindow = new GameWindow(this);
+        gameWindow = new GameWindow(startFrame);
 
         // socket
         socket = null;
@@ -72,16 +67,12 @@ public class StartWindow implements ActionListener {
         // 기본 port 지정
         port = Board.DEFAULT_PORT;
 
-        // Reader, Sender 생성
-        clientReader = new ClientReader(gameWindow);
-        clientSender = new ClientSender();
-
         // start 프레임 기본 설정
         startFrame.setVisible(true);
         startFrame.requestFocus();
     }
 
-    JFrame getFrame(){
+    public JFrame getFrame(){
         return startFrame;
     }
 
@@ -91,12 +82,8 @@ public class StartWindow implements ActionListener {
             address = ipTextArea.getText();
             port = Integer.parseInt(portTextArea.getText());
             socket = new Socket(address, port);
-            clientSender.setSocket(socket);
-            clientReader.setSocket(socket);
-            new Thread(clientReader).start();
-            startFrame.setVisible(false);
-            gameWindow.getFrame().setVisible(true);
-            gameWindow.getFrame().requestFocus();
+
+            gameWindow.startGame(socket);
         } catch (UnknownHostException unknownHostException) {
             unknownHostException.printStackTrace();
         } catch (IOException ioException) {

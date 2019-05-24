@@ -6,15 +6,19 @@ import java.io.ObjectOutputStream;
 
 public class ClientSender {
     private ObjectOutputStream objectOutputStream;
-    private char dir;
     
-    public ClientSender() {
-        objectOutputStream = null;
+    public ClientSender(Socket socket) {
+        try {
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+            objectOutputStream = null;
+        }
     }
 
     public void sending(char dir){
         try {
-                if(objectOutputStream != null){
+            if(objectOutputStream != null){
                 objectOutputStream.writeChar(dir);
                 objectOutputStream.reset();
             }
@@ -23,9 +27,9 @@ public class ClientSender {
         }
     }
 
-    public void setSocket(Socket socket) {
+    public void reset(){
         try {
-            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,109 +1,109 @@
 package snakegame;
 
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.io.IOException;
+
+import javax.swing.JFrame;
+
 import java.util.ArrayList;
 import java.util.Random;
-import javax.swing.JFrame;
 
 import snakegame.ServerReader;
 import snakegame.ServerSender;
 import snakegame.Snake;
 import snakegame.Part;
 import snakegame.Apple;
+import snakegame.ServerAccepter;
 import snakegame.Board;
 
-public class ServerWindow implements Runnable{
-	private ServerSocket serverSocket;
-	private ArrayList<Socket> playerSockets;
-	private ArrayList<ServerReader> serverReaders;
-	private ArrayList<ServerSender> serverSenders;
+public class ServerWindow {
+	public ServerSocket serverSocket;
+	public ArrayList<Socket> playerSockets;
+	public ArrayList<ServerReader> serverReaders;
+	public ArrayList<ServerSender> serverSenders;
+
 	private JFrame serverFrame;
-	private ArrayList<Snake> snake;
+
+	public ArrayList<Snake> snakes;
 	public Apple apple;
+	public int curPlayer;
+
+	private ServerAccepter serverAccepter;
+
 	private Random random;
-	private boolean stop;
-	private int playerCount;
-	
+
 	public ServerWindow() {
-		random = new Random();
-		snake = new ArrayList<Snake>();
-		//snake = new Snake(10, 10);
-		apple = new Apple(20, 20);
-
-		//serverReader = new ServerReader(this, snake);
-		serverReaders = new ArrayList<ServerReader>();
-		//serverSender = new ServerSender(this, snake);
-		serverSenders = new ArrayList<ServerSender>();
-		
-		serverSocket = null;
-		//playerSocket = null;
-		playerSockets = new ArrayList<Socket>();
-		
-		serverFrame = new JFrame();
-		serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		serverFrame.setSize(400, 200);
-		serverFrame.setResizable(false);
-		serverFrame.setVisible(true);
-
-		stop = false;
-		playerCount = 0;
-		new Thread(this).start();
-	}
-
-	public void run(){
 		try {
+			// socket, reader, sender 초기화
 			serverSocket = new ServerSocket(49152);
-			while(playerCount != 2) 
-			{
-				playerSockets.add(serverSocket.accept());
-				snake.add(new Snake(playerCount));
-				serverSenders.add(new ServerSender(snake, apple));
-				serverSenders.get(playerCount).setSocket(playerSockets.get(playerCount));
-				serverReaders.add(new ServerReader(playerCount));
-				serverReaders.get(playerCount).setSocket(playerSockets.get(playerCount));
-				playerCount++;
-			}
-			for(int i=0; i<playerCount; i++)
-			{
-				new Thread(serverReaders.get(i)).start();
-			}
-			
-			while (!stop) {
-				for(int i=0; i<playerCount; i++)
-		    	{
-					setDir(snake.get(i), serverReaders.get(i).getDirection());
-					move(snake.get(i));
-					shiftDir(snake.get(i));
-		    	}
-				
-				for(int i=0; i<playerCount; i++)
-				{
-					for(int j=0; j<playerCount; j++)
-		        	{
-	        			collisionHB(snake.get(i), snake.get(j));
-	        			if(i != j)
-	        			{
-	        				collisionHH(snake.get(i), snake.get(j));
-	        			}
-		        	}	    
-				}
-				collisionHA(snake, apple);
-				for(int i=0; i<playerCount; i++)
-				{
-					serverSenders.get(i).sending();
-				}
-				Thread.sleep(50);
-			}
-		} catch (IOException | InterruptedException e) {
+			playerSockets = new ArrayList<Socket>();
+			serverReaders = new ArrayList<ServerReader>();
+			serverSenders = new ArrayList<ServerSender>();
+
+			// server 프레임 생성
+			serverFrame = new JFrame();
+			serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			serverFrame.setSize(400, 200);
+			serverFrame.setResizable(false);
+
+			// snake, apple 초기화
+			snakes = new ArrayList<Snake>();
+			apple = new Apple(20, 20);
+			curPlayer = 0;
+
+			// sever accepter 생성
+			serverAccepter = new ServerAccepter(this);
+
+			// 나머지 변수 초기화
+			random = new Random();
+
+			// server 프레임 보이기 설정
+			serverFrame.setVisible(true);
+			serverFrame.requestFocus();
+		}
+		// 예외처리
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void threadStop(){
-        stop = true;
-    }
+	public void start() {
+		new Thread(serverAccepter).start();
+		while (true) {
+			try {
+				if (curPlayer > 0) {
+					for (int i = 0; i < curPlayer; i++) {
+						setDir(snakes.get(i), serverReaders.get(i).getDirection());
+						move(snakes.get(i));
+						shiftDir(snakes.get(i));
+					}
+					for (int i = 0; i < curPlayer; i++) {
+						for (int j = 0; j < curPlayer; j++) {
+							collisionHB(snakes.get(i), snakes.get(j));
+							if (i != j) {
+								collisionHH(snakes.get(i), snakes.get(j));
+							}
+						}
+					}
+					collisionHA(snakes, apple);
+					for (int i = 0; i < curPlayer; i++) {
+						serverSenders.get(i).sending();
+					}
+				}
+			} catch (IndexOutOfBoundsException e2) {
+				e2.printStackTrace();
+			} catch (NullPointerException e3) {
+				e3.printStackTrace();
+			} finally {
+				try {
+					Thread.sleep(Board.sleepTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
   private void move(Snake snake) {
 		for(int i = 0;i < snake.maxLength;i++) {
@@ -237,9 +237,8 @@ public class ServerWindow implements Runnable{
 					}
 					break;
 				}
-				/*
-				if(s.maxLength > 10)
-				{
+				/* 레벨업 기능
+				if(s.maxLength > 10) {
 					s.updateLevel();
 				}
 				*/
