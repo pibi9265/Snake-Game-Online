@@ -63,6 +63,7 @@ public class GameWindow implements KeyListener, WindowListener {
 
 		gameFrame.setVisible(false);
 		startFrame.setVisible(true);
+		startFrame.requestFocus();
 	}
 
 	public JFrame getFrame() {

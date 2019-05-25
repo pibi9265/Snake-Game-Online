@@ -2,9 +2,12 @@ package snakegame;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.InetAddress;
 import java.io.IOException;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -36,7 +39,8 @@ public class ServerWindow {
 	public ServerWindow() {
 		try {
 			// socket, reader, sender 초기화
-			serverSocket = new ServerSocket(49152);
+			int port = Board.DEFAULT_PORT;
+			serverSocket = new ServerSocket(port);
 			playerSockets = new ArrayList<Socket>();
 			serverReaders = new ArrayList<ServerReader>();
 			serverSenders = new ArrayList<ServerSender>();
@@ -44,12 +48,19 @@ public class ServerWindow {
 			// server 프레임 생성
 			serverFrame = new JFrame();
 			serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			serverFrame.setSize(400, 200);
+			serverFrame.setSize(Board.serverFrameWidth, Board.serverFrameHeight);
 			serverFrame.setResizable(false);
+			// panel 생성
+			JPanel panel = new JPanel();
+			serverFrame.add(panel);
+			// address text area 생성 & panel에 추가
+			String addresString = new String("Hello, Snakes! ["+InetAddress.getLocalHost().getHostAddress()+"] ["+port+"]");
+			JLabel ipLabel = new JLabel(addresString);
+			panel.add(ipLabel);
 
 			// snake, apple 초기화
 			snakes = new ArrayList<Snake>();
-			apple = new Apple(20, 20);
+			apple = new Apple(Board.width/Board.grid - 2, Board.height/Board.grid - 2);
 			curPlayer = 0;
 
 			// sever accepter 생성
@@ -207,8 +218,9 @@ public class ServerWindow {
 	}
 
 	private void collisionHA(ArrayList<Snake> snakes, Apple a) {
-		for(int i=0; i<snakes.size(); i++)
-		{
+		boolean check = false;
+
+		for(int i=0; i<snakes.size(); i++) {
 			Snake s = snakes.get(i);
 			
 			if((s.body.get(0).x==a.x)&&(s.body.get(0).y==a.y)) {
@@ -224,24 +236,24 @@ public class ServerWindow {
 				s.body.get(s.maxLength-1).up = s.body.get(s.maxLength-2).up;
 				s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
 				s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
-				
-				while(true){
-					a.x = random.nextInt(49);
-					a.y = random.nextInt(49);
-					
-					for(int j=0; j<snakes.size(); j++)
-					{
-						if(collisionSA(snakes.get(j), a)){
-							continue;
-						}
-					}
-					break;
-				}
+				check = true;
 				/* 레벨업 기능
 				if(s.maxLength > 10) {
 					s.updateLevel();
 				}
 				*/
+			}
+		}
+
+		while(check){
+			a.x = random.nextInt(49);
+			a.y = random.nextInt(49);
+			check = false;
+			
+			for(int i=0; i<snakes.size(); i++) {
+				if(collisionSA(snakes.get(i), a)){
+					check = true;
+				}
 			}
 		}
 	}

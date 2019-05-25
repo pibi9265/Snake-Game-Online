@@ -16,4 +16,6 @@ public class Board{
 	public static String DEFAULT_ADDRESS = "127.0.0.1";
 	public static int DEFAULT_PORT = 49152;
 	public static int sleepTime = 50;
+	public static int serverFrameWidth = 400;
+	public static int serverFrameHeight = 80;
 }
