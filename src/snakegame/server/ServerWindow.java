@@ -93,7 +93,7 @@ public class ServerWindow {
 		new Thread(serverAccepter).start();
 
 		SnakeSetDirInterface ssdi = new SnakeSetDirImpl(snakes);
-		Naming.rebind("rmi://" + "192.168.43.149" + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName, ssdi);
+		Naming.rebind("rmi://" + Board.DEFAULT_ADDRESS + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName, ssdi);
 
 		while (true) {
 			try {
