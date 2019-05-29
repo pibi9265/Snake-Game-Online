@@ -14,3 +14,8 @@ jar -cvfm server.jar ..\META-INF\manifest.mf .\snakegame\server .\snakegame\elem
 manifest파일(client) 변경하고
 bin폴더에서
 jar -cvfm client.jar ..\META-INF\manifest.mf .\snakegame\client .\snakegame\element
+
+
+java -classpath . -Djava.rmi.server.codebase=file:F:\Git Workspace\Snake-Gmae-Online\snakegame\element\ snakegame.server.ServerDo
+
+

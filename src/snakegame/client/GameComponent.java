@@ -43,6 +43,7 @@ public class GameComponent extends JComponent{
 			g.setColor(Color.red);
 			g.drawRect(apple.x*Board.grid, apple.y*Board.grid, Board.grid , Board.grid);
 			g.fillRect(apple.x*Board.grid, apple.y*Board.grid, Board.grid , Board.grid);
+			keyPressed = false;
 		}
 	}
 }

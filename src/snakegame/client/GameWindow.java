@@ -4,7 +4,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
 
@@ -12,6 +16,7 @@ import snakegame.client.GameComponent;
 import snakegame.client.ClientReader;
 //import snakegame.client.ClientSender;
 import snakegame.element.Board;
+import snakegame.element.SnakeSetDirInterface;
 
 public class GameWindow implements KeyListener, WindowListener {
 	private JFrame gameFrame;
@@ -20,7 +25,7 @@ public class GameWindow implements KeyListener, WindowListener {
 	private JFrame startFrame;
 
 	private ClientReader clientReader;
-	//private ClientSender clientSender;
+	// private ClientSender clientSender;
 
 	private int id;
 
@@ -42,7 +47,7 @@ public class GameWindow implements KeyListener, WindowListener {
 
 		// Reader, Sender 초기화
 		clientReader = null;
-		//clientSender = null;
+		// clientSender = null;
 
 		// id 초기화
 		id = -1;
@@ -56,15 +61,15 @@ public class GameWindow implements KeyListener, WindowListener {
 		clientReader = new ClientReader(socket, this, gameComponent);
 		new Thread(clientReader).start();
 
-		//clientSender = new ClientSender(socket);
+		// clientSender = new ClientSender(socket);
 	}
 
 	public void reset() {
 		// Reader 초기화
 		clientReader = null;
 		// Sender 초기화
-		//clientSender.reset();
-		//clientSender = null;
+		// clientSender.reset();
+		// clientSender = null;
 
 		id = -1;
 
@@ -77,28 +82,37 @@ public class GameWindow implements KeyListener, WindowListener {
 		return gameFrame;
 	}
 
-	public void setId(int id){
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public int getId(){
+	public int getId() {
 		return id;
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed) {
-			//clientSender.sending('R');
-			gameComponent.keyPressed = true;
-		} else if (e.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed) {
-			//clientSender.sending('L');
-			gameComponent.keyPressed = true;
-		} else if (e.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed) {
-			//clientSender.sending('D');
-			gameComponent.keyPressed = true;
-		} else if (e.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed) {
-			//clientSender.sending('U');
-			gameComponent.keyPressed = true;
+		try {
+			SnakeSetDirInterface ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + Board.DEFAULT_ADDRESS + "/" + Board.serverName);
+			if (e.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed) {
+				ssdi.setDir(id, 'R');
+				//clientSender.sending('R');
+				gameComponent.keyPressed = true;
+			} else if (e.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed) {
+				ssdi.setDir(id, 'L');
+				//clientSender.sending('L');
+				gameComponent.keyPressed = true;
+			} else if (e.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed) {
+				ssdi.setDir(id, 'D');
+				//clientSender.sending('D');
+				gameComponent.keyPressed = true;
+			} else if (e.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed) {
+				ssdi.setDir(id, 'U');
+				//clientSender.sending('U');
+				gameComponent.keyPressed = true;
+			}
+		} catch (MalformedURLException | RemoteException | NotBoundException e1) {
+			e1.printStackTrace();
 		}
 	}
 	public void keyTyped(KeyEvent e) {}

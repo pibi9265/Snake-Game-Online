@@ -2,7 +2,10 @@ package snakegame.server;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.io.IOException;
 
 import javax.swing.JFrame;
@@ -15,6 +18,8 @@ import java.util.Random;
 //import snakegame.server.ServerReader;
 import snakegame.server.ServerSender;
 import snakegame.element.Snake;
+import snakegame.element.SnakeSetDirImpl;
+import snakegame.element.SnakeSetDirInterface;
 import snakegame.element.Part;
 import snakegame.element.Apple;
 import snakegame.server.ServerAccepter;
@@ -23,7 +28,7 @@ import snakegame.element.Board;
 public class ServerWindow {
 	public ServerSocket serverSocket;
 	public ArrayList<Socket> playerSockets;
-	//public ArrayList<ServerReader> serverReaders;
+	// public ArrayList<ServerReader> serverReaders;
 	public ArrayList<ServerSender> serverSenders;
 
 	private JFrame serverFrame;
@@ -42,7 +47,7 @@ public class ServerWindow {
 			int port = Board.DEFAULT_PORT;
 			serverSocket = new ServerSocket(port);
 			playerSockets = new ArrayList<Socket>();
-			//serverReaders = new ArrayList<ServerReader>();
+			// serverReaders = new ArrayList<ServerReader>();
 			serverSenders = new ArrayList<ServerSender>();
 
 			// server 프레임 생성
@@ -54,13 +59,14 @@ public class ServerWindow {
 			JPanel panel = new JPanel();
 			serverFrame.add(panel);
 			// address text area 생성 & panel에 추가
-			String addresString = new String("Hello, Snakes! ["+InetAddress.getLocalHost().getHostAddress()+"] ["+port+"]");
+			String addresString = new String(
+					"Hello, Snakes! [" + InetAddress.getLocalHost().getHostAddress() + "] [" + port + "]");
 			JLabel ipLabel = new JLabel(addresString);
 			panel.add(ipLabel);
 
 			// snake, apple 초기화
 			snakes = new ArrayList<Snake>();
-			apple = new Apple(Board.width/Board.grid - 2, Board.height/Board.grid - 2);
+			apple = new Apple(Board.width / Board.grid - 2, Board.height / Board.grid - 2);
 			curPlayer = 0;
 
 			// sever accepter 생성
@@ -80,7 +86,15 @@ public class ServerWindow {
 	}
 
 	public void start() {
+		//////////////////////////////////////////////////////////////////////////////
+		try {
+		//////////////////////////////////////////////////////////////////////////////
+
 		new Thread(serverAccepter).start();
+
+		SnakeSetDirInterface ssdi = new SnakeSetDirImpl(snakes);
+		Naming.rebind("rmi://" + "192.168.43.149" + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName, ssdi);
+
 		while (true) {
 			try {
 				if (curPlayer > 0) {
@@ -114,6 +128,14 @@ public class ServerWindow {
 				}
 			}
 		}
+
+		//////////////////////////////////////////////////////////////////////////////
+		} catch (RemoteException e1) {
+			e1.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		//////////////////////////////////////////////////////////////////////////////
 	}
 
   private void move(Snake snake) {

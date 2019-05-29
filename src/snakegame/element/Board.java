@@ -18,4 +18,5 @@ public class Board{
 	public static int sleepTime = 50;
 	public static int serverFrameWidth = 400;
 	public static int serverFrameHeight = 80;
+	public static String serverName = "snakegameonline";
 }

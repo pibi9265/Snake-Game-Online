@@ -9,7 +9,7 @@ public class SnakeSetDirImpl extends UnicastRemoteObject implements SnakeSetDirI
 
     private ArrayList<Snake> snakes;
 
-    protected SnakeSetDirImpl(ArrayList<Snake> snakes) throws RemoteException {
+    public SnakeSetDirImpl(ArrayList<Snake> snakes) throws RemoteException {
         super();
         this.snakes = snakes;
     }
