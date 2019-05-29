@@ -15,4 +15,6 @@ manifest파일(client) 변경하고
 bin폴더에서
 jar -cvfm client.jar ..\META-INF\manifest.mf .\snakegame\client .\snakegame\element
 
+
+bin 폴더에서
 start rmiregistry 49154

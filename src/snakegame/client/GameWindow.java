@@ -29,6 +29,8 @@ public class GameWindow implements KeyListener, WindowListener {
 
 	private int id;
 
+	private SnakeSetDirInterface ssdi;
+
 	public GameWindow(JFrame startFrame) {
 		// game 프레임 생성
 		gameFrame = new JFrame();
@@ -51,6 +53,14 @@ public class GameWindow implements KeyListener, WindowListener {
 
 		// id 초기화
 		id = -1;
+
+		// ssdi 초기화
+		try {
+			//ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + Board.DEFAULT_ADDRESS + "/" + Board.serverName);
+			ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + Board.DEFAULT_ADDRESS + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName);
+		} catch (MalformedURLException | RemoteException | NotBoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void startGame(Socket socket) {
@@ -93,7 +103,6 @@ public class GameWindow implements KeyListener, WindowListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		try {
-			SnakeSetDirInterface ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + Board.DEFAULT_ADDRESS + "/" + Board.serverName);
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed) {
 				ssdi.setDir(id, 'R');
 				//clientSender.sending('R');
@@ -111,7 +120,7 @@ public class GameWindow implements KeyListener, WindowListener {
 				//clientSender.sending('U');
 				gameComponent.keyPressed = true;
 			}
-		} catch (MalformedURLException | RemoteException | NotBoundException e1) {
+		} catch (RemoteException e1) {
 			e1.printStackTrace();
 		}
 	}
