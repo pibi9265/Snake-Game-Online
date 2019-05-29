@@ -146,6 +146,7 @@ public class ServerWindow {
 		}
 	}
 	
+	/*
 	public void setDir(Snake snake, char dir){
 		if(dir == 'R' && (!snake.body.get(0).left)) {
 			snake.body.get(0).dx = 1;
@@ -180,6 +181,7 @@ public class ServerWindow {
 			snake.body.get(0).up = true;
 		}
 	}
+	*/
 
   private void collisionHB(Snake h, Snake b) {
 		if(b.maxLength!=1) {

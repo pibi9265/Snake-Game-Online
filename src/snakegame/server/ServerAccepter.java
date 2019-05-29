@@ -28,7 +28,7 @@ public class ServerAccepter implements Runnable {
                 if(serverWindow.curPlayer <= Board.maxPlayer){
                     serverWindow.snakes.add(new Snake(1, 1));
 
-                    serverWindow.serverSenders.add(new ServerSender(serverWindow.playerSockets.get(serverWindow.curPlayer-1), serverWindow));
+                    serverWindow.serverSenders.add(new ServerSender(serverWindow.playerSockets.get(serverWindow.curPlayer-1), serverWindow, serverWindow.snakes.get(serverWindow.curPlayer-1)));
 
                     //serverWindow.serverReaders.add(new ServerReader(serverWindow.playerSockets.get(serverWindow.curPlayer-1), serverWindow.snakes.get(serverWindow.curPlayer-1), serverWindow.serverSenders.get(serverWindow.curPlayer-1), serverWindow));
                     //new Thread(serverWindow.serverReaders.get(serverWindow.curPlayer-1)).start();
