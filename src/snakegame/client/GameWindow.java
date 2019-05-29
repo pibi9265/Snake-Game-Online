@@ -48,7 +48,6 @@ public class GameWindow implements KeyListener, WindowListener {
 		clientReader = new ClientReader(socket, this, gameComponent);
 		
 		new Thread(clientReader).start();
-		System.out.println("Game Started");
 	}
 
 	public void reset() {

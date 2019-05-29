@@ -56,7 +56,6 @@ public class ServerHolder {
 							SelectionKey selectionKey = iterator.next();
 							
 							if(selectionKey.isAcceptable()) {
-								System.out.println("Accepting in Process");
 								accept(selectionKey);
 							}
 							iterator.remove();
@@ -80,7 +79,6 @@ public class ServerHolder {
     	
     	try {
 			player = serverSocketChannel.accept();
-			System.out.println("Accepted");
 	    	Iterator<ServerWindow> iter = roomList.iterator();
 	    	
 	    	while(iter.hasNext()) {

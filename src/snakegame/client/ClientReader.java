@@ -41,17 +41,13 @@ public class ClientReader implements Runnable {
     @SuppressWarnings("unchecked")
 	public void run() {
         while (!stop) {
-        	System.out.println("Client Reader Running");
             try {
             	objectOutputStream.writeChar(dir);
                 objectOutputStream.reset();
                 
                 if (objectInputStream != null) {
-                	System.out.println("Try To Read Objects");
                     snakes = (ArrayList<Snake>) objectInputStream.readObject();
                     apple = (Apple) objectInputStream.readObject();
-                    System.out.println("Read Client Objects Complete");
-                    
                     gameComponent.paintGameComponents(snakes, apple);
                    }
             } catch (ClassNotFoundException e) {
