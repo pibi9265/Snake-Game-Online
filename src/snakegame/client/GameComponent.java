@@ -26,6 +26,7 @@ public class GameComponent extends JComponent{
 
     public void paintGameComponents(ArrayList<Snake> snakes, Apple apple){
         this.snakes = snakes;
+        System.out.println("Cur Snake: " + this.snakes.size());
         this.apple = apple;
 		repaint();
     }
@@ -33,9 +34,12 @@ public class GameComponent extends JComponent{
     @Override
     public void paint (Graphics g) {
 		if(snakes!=null && apple!=null){
+			System.out.println("Painting Start");
+			System.out.println(snakes.size());
 			g.setColor(Color.black);
 			for(int i=0; i<snakes.size(); i++){
 				for(int j = 0;j < snakes.get(i).maxLength;j++) {
+					System.out.println("Cur Snake: " + snakes.get(i).body.get(j).x*Board.grid + ", " + snakes.get(i).body.get(j).y*Board.grid);
 					g.drawRect(snakes.get(i).body.get(j).x*Board.grid, snakes.get(i).body.get(j).y*Board.grid, Board.grid , Board.grid);
 					g.fillRect(snakes.get(i).body.get(j).x*Board.grid, snakes.get(i).body.get(j).y*Board.grid, Board.grid , Board.grid);
 				}

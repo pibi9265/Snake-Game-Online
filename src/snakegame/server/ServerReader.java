@@ -1,8 +1,11 @@
+/*
 package snakegame.server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 
 import snakegame.element.Snake;
 import snakegame.element.Board;
@@ -32,9 +35,12 @@ public class ServerReader implements Runnable {
 
     @Override
     public void run() {
+    	stop = false;
         while (!stop) {
             try {
+            	System.out.println("Try Reading Direction");
                 dir = objectInputStream.readChar();
+                System.out.println("Reading Direction Complete");
             } catch (IOException e1) {
                 e1.printStackTrace();
 
@@ -51,15 +57,11 @@ public class ServerReader implements Runnable {
                     e2.printStackTrace();
                 }
             } finally {
-                try {
-                    Thread.sleep(Board.sleepTime/10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            	
             }
         }
     }
-
+    
     public void threadStop(){
         stop = true;
     }
@@ -68,3 +70,4 @@ public class ServerReader implements Runnable {
     	return dir;
     }
 }
+*/

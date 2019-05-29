@@ -10,7 +10,6 @@ import javax.swing.JFrame;
 
 import snakegame.client.GameComponent;
 import snakegame.client.ClientReader;
-import snakegame.client.ClientSender;
 import snakegame.element.Board;
 
 public class GameWindow implements KeyListener, WindowListener {
@@ -20,7 +19,6 @@ public class GameWindow implements KeyListener, WindowListener {
 	private JFrame startFrame;
 
 	private ClientReader clientReader;
-	private ClientSender clientSender;
 
 	public GameWindow(JFrame startFrame) {
 		// game 프레임 생성
@@ -40,26 +38,22 @@ public class GameWindow implements KeyListener, WindowListener {
 
 		// Reader, Sender 초기화
 		clientReader = null;
-		clientSender = null;
 	}
 
 	public void startGame(Socket socket) {
 		startFrame.setVisible(false);
 		gameFrame.setVisible(true);
 		gameFrame.requestFocus();
-
+		
 		clientReader = new ClientReader(socket, this, gameComponent);
+		
 		new Thread(clientReader).start();
-
-		clientSender = new ClientSender(socket);
+		System.out.println("Game Started");
 	}
 
 	public void reset() {
 		// Reader 초기화
 		clientReader = null;
-		// Sender 초기화
-		clientSender.reset();
-		clientSender = null;
 
 		gameFrame.setVisible(false);
 		startFrame.setVisible(true);
@@ -73,17 +67,17 @@ public class GameWindow implements KeyListener, WindowListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed) {
-			clientSender.sending('R');
 			gameComponent.keyPressed = true;
+			clientReader.setDir('R');
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed) {
-			clientSender.sending('L');
 			gameComponent.keyPressed = true;
+			clientReader.setDir('L');
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed) {
-			clientSender.sending('D');
 			gameComponent.keyPressed = true;
+			clientReader.setDir('D');
 		} else if (e.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed) {
-			clientSender.sending('U');
 			gameComponent.keyPressed = true;
+			clientReader.setDir('U');
 		}
 	}
 	public void keyTyped(KeyEvent e) {}

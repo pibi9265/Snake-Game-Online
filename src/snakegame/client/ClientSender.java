@@ -1,7 +1,9 @@
+/*
 package snakegame.client;
 
 import java.net.Socket;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class ClientSender {
@@ -19,9 +21,11 @@ public class ClientSender {
     public void sending(char dir){
         try {
             if(objectOutputStream != null){
+            	System.out.println("Try Sending Direction");
                 objectOutputStream.writeChar(dir);
                 objectOutputStream.reset();
             }
+            System.out.println("Sending Direction Complete");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,3 +39,4 @@ public class ClientSender {
         }
     }
 }
+*/

@@ -7,9 +7,10 @@ import javax.swing.JTextArea;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
+import java.nio.channels.SocketChannel;
 import java.io.IOException;
 
 import snakegame.element.Board;
@@ -82,7 +83,7 @@ public class StartWindow implements ActionListener {
             address = ipTextArea.getText();
             port = Integer.parseInt(portTextArea.getText());
             socket = new Socket(address, port);
-
+            
             gameWindow.startGame(socket);
         } catch (UnknownHostException unknownHostException) {
             unknownHostException.printStackTrace();

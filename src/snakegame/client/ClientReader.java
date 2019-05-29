@@ -4,6 +4,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import snakegame.client.GameComponent;
 import snakegame.element.Snake;
@@ -12,17 +13,20 @@ import snakegame.element.Board;
 
 public class ClientReader implements Runnable {
     private ObjectInputStream objectInputStream;
+    private ObjectOutputStream objectOutputStream;
     private GameWindow gameWindow;
     private GameComponent gameComponent;
     private boolean stop;
     private int curPlayer;
     private ArrayList<Snake> snakes;
     private Apple apple;
-
+    private char dir;
+    
     public ClientReader(Socket socket,GameWindow gameWindow, GameComponent gameComponent) {
         try {
-            objectInputStream = new ObjectInputStream(socket.getInputStream());
-        } catch (IOException e) {
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        	objectInputStream = new ObjectInputStream(socket.getInputStream());
+        } catch (Exception e) {
             e.printStackTrace();
             objectInputStream = null;
         }
@@ -30,53 +34,49 @@ public class ClientReader implements Runnable {
         this.gameComponent = gameComponent;
         stop = false;
         curPlayer = 0;
-        snakes = new ArrayList<Snake>();
+        snakes = null;
         apple = null;
     }
 
-    public void run() {
+    @SuppressWarnings("unchecked")
+	public void run() {
         while (!stop) {
+        	System.out.println("Client Reader Running");
             try {
+            	objectOutputStream.writeChar(dir);
+                objectOutputStream.reset();
+                
                 if (objectInputStream != null) {
-                    curPlayer = objectInputStream.readInt();
-                    if(curPlayer > Board.maxPlayer){
-                        threadStop();
-                    }
-                    else{
-                        for (int i = 0; i < curPlayer; i++) {
-                            snakes.add((Snake) objectInputStream.readObject());
-                        }
-                        apple = (Apple) objectInputStream.readObject();
-
-                        gameComponent.paintGameComponents(snakes, apple);
-                    }
-                }
+                	System.out.println("Try To Read Objects");
+                    snakes = (ArrayList<Snake>) objectInputStream.readObject();
+                    apple = (Apple) objectInputStream.readObject();
+                    System.out.println("Read Client Objects Complete");
+                    
+                    gameComponent.paintGameComponents(snakes, apple);
+                   }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
                 threadStop();
             } finally {
-                try {
-                    Thread.sleep(Board.sleepTime/10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
             gameComponent.keyPressed = false;
-            curPlayer = 0;
-            snakes.clear();
-            apple = null;
         }
         try {
             objectInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        gameWindow.reset();
+        //gameWindow.reset();
     }
 
     public void threadStop(){
         stop = true;
+    }
+    
+    public void setDir(char dir)
+    {
+    	this.dir = dir;
     }
 }
