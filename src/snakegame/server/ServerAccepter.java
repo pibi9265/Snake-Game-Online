@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import snakegame.server.ServerWindow;
-import snakegame.server.ServerReader;
+//import snakegame.server.ServerReader;
 import snakegame.server.ServerSender;
 import snakegame.element.Snake;
 import snakegame.element.Board;
@@ -30,13 +30,13 @@ public class ServerAccepter implements Runnable {
 
                     serverWindow.serverSenders.add(new ServerSender(serverWindow.playerSockets.get(serverWindow.curPlayer-1), serverWindow));
 
-                    serverWindow.serverReaders.add(new ServerReader(serverWindow.playerSockets.get(serverWindow.curPlayer-1), serverWindow.snakes.get(serverWindow.curPlayer-1), serverWindow.serverSenders.get(serverWindow.curPlayer-1), serverWindow));
-                    new Thread(serverWindow.serverReaders.get(serverWindow.curPlayer-1)).start();
+                    //serverWindow.serverReaders.add(new ServerReader(serverWindow.playerSockets.get(serverWindow.curPlayer-1), serverWindow.snakes.get(serverWindow.curPlayer-1), serverWindow.serverSenders.get(serverWindow.curPlayer-1), serverWindow));
+                    //new Thread(serverWindow.serverReaders.get(serverWindow.curPlayer-1)).start();
                 }else{
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(serverWindow.playerSockets.get(serverWindow.curPlayer-1).getOutputStream());
                     serverWindow.playerSockets.remove(serverWindow.curPlayer-1);
-                    serverWindow.curPlayer--;
                     objectOutputStream.writeInt(serverWindow.curPlayer);
+                    serverWindow.curPlayer--;
                     objectOutputStream.close();
                 }
             } catch (IOException e) {

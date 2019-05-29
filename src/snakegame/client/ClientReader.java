@@ -4,6 +4,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import snakegame.client.GameComponent;
 import snakegame.element.Snake;
@@ -12,6 +13,7 @@ import snakegame.element.Board;
 
 public class ClientReader implements Runnable {
     private ObjectInputStream objectInputStream;
+    private ObjectOutputStream objectOutputStream;
     private GameWindow gameWindow;
     private GameComponent gameComponent;
     private boolean stop;
@@ -22,6 +24,7 @@ public class ClientReader implements Runnable {
     public ClientReader(Socket socket,GameWindow gameWindow, GameComponent gameComponent) {
         try {
             objectInputStream = new ObjectInputStream(socket.getInputStream());
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
             objectInputStream = null;
@@ -39,7 +42,10 @@ public class ClientReader implements Runnable {
             try {
                 if (objectInputStream != null) {
                     curPlayer = objectInputStream.readInt();
-                    if(curPlayer > Board.maxPlayer){
+                    if(gameWindow.getId() == -1){
+                        gameWindow.setId(curPlayer);
+                    }
+                    if(gameWindow.getId() > Board.maxPlayer){
                         threadStop();
                     }
                     else{

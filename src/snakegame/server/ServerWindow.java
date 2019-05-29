@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import java.util.ArrayList;
 import java.util.Random;
 
-import snakegame.server.ServerReader;
+//import snakegame.server.ServerReader;
 import snakegame.server.ServerSender;
 import snakegame.element.Snake;
 import snakegame.element.Part;
@@ -23,7 +23,7 @@ import snakegame.element.Board;
 public class ServerWindow {
 	public ServerSocket serverSocket;
 	public ArrayList<Socket> playerSockets;
-	public ArrayList<ServerReader> serverReaders;
+	//public ArrayList<ServerReader> serverReaders;
 	public ArrayList<ServerSender> serverSenders;
 
 	private JFrame serverFrame;
@@ -42,7 +42,7 @@ public class ServerWindow {
 			int port = Board.DEFAULT_PORT;
 			serverSocket = new ServerSocket(port);
 			playerSockets = new ArrayList<Socket>();
-			serverReaders = new ArrayList<ServerReader>();
+			//serverReaders = new ArrayList<ServerReader>();
 			serverSenders = new ArrayList<ServerSender>();
 
 			// server 프레임 생성
@@ -85,7 +85,7 @@ public class ServerWindow {
 			try {
 				if (curPlayer > 0) {
 					for (int i = 0; i < curPlayer; i++) {
-						setDir(snakes.get(i), serverReaders.get(i).getDirection());
+						//setDir(snakes.get(i), serverReaders.get(i).getDirection());
 						move(snakes.get(i));
 						shiftDir(snakes.get(i));
 					}
