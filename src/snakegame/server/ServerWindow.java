@@ -3,7 +3,10 @@ package snakegame.server;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.SocketChannel;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,6 +21,8 @@ import java.util.List;
 import java.util.Random;
 
 import snakegame.element.Snake;
+import snakegame.element.SnakeSetDirImpl;
+import snakegame.element.SnakeSetDirInterface;
 import snakegame.element.Part;
 import snakegame.element.Apple;
 import snakegame.element.Board;
@@ -30,7 +35,8 @@ public class ServerWindow extends Thread{
 	public ArrayList<Snake> snakes;
 	public Apple apple;
 	public int curPlayer;
-
+	private int i;
+	
 	//private ServerAccepter serverAccepter;
 
 	private Random random;
@@ -58,6 +64,11 @@ public class ServerWindow extends Thread{
 		if(curPlayer >= Board.maxPlayer)
 			return -1;
 		
+		if(curPlayer == 0)
+		{
+			apple = new Apple(Board.width/Board.grid - 2, Board.height/Board.grid - 2);
+		}
+		
 		playerSockets.add(player);
 		objectOutputStreams.add(new ObjectOutputStream(player.getOutputStream()));
 		objectInputStreams.add(new ObjectInputStream(player.getInputStream()));
@@ -67,6 +78,21 @@ public class ServerWindow extends Thread{
         return 1;
 	}
 	
+	synchronized public void delPlayer(int player)
+	{
+		try {
+			playerSockets.get(i).close();
+			playerSockets.remove(i);
+			objectOutputStreams.remove(i);
+			objectInputStreams.remove(i);
+			snakes.remove(i);
+			curPlayer--;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public Boolean isStopped()
 	{
 		return stopped;
@@ -74,21 +100,28 @@ public class ServerWindow extends Thread{
 	
 	public void run() {
 		stopped = false;
+		try {
+			SnakeSetDirInterface ssdi;
+			ssdi = new SnakeSetDirImpl(snakes);
+			Naming.rebind("rmi://" + Board.DEFAULT_ADDRESS + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName, ssdi);
+		} catch (RemoteException | MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		while (!stopped) {
 			try {
 				synchronized(this)
 				{
 					if (curPlayer > 0) {
 						
-						for (int i = 0; i < curPlayer; i++) {
+						for (i = 0; i < curPlayer; i++) {
 							objectOutputStreams.get(i).writeObject(snakes);
 							objectOutputStreams.get(i).writeObject(apple);
 							objectOutputStreams.get(i).reset();
 						}
 						
-						for (int i = 0; i < curPlayer; i++) {
-							char dirInput = objectInputStreams.get(i).readChar();
-							setDir(snakes.get(i), dirInput);
+						for (i = 0; i < curPlayer; i++) {
 							move(snakes.get(i));
 							shiftDir(snakes.get(i));
 						}
@@ -117,7 +150,7 @@ public class ServerWindow extends Thread{
 			} catch (InterruptedException e) {
 					e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				delPlayer(i);
 				e.printStackTrace();
 			}
 		}
@@ -153,41 +186,6 @@ public class ServerWindow extends Thread{
 		}
 	}
 	
-	public void setDir(Snake snake, char dir){
-		if(dir == 'R' && (!snake.body.get(0).left)) {
-			snake.body.get(0).dx = 1;
-			snake.body.get(0).dy = 0;
-			snake.body.get(0).right = true;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = false;
-		}
-		else if(dir == 'L' && (!snake.body.get(0).right)) {
-			snake.body.get(0).dx = -1;
-			snake.body.get(0).dy = 0;
-			snake.body.get(0).right = false;
-			snake.body.get(0).left = true;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = false;
-		}
-		else if(dir == 'D' && (!snake.body.get(0).up)) {
-			snake.body.get(0).dx = 0;
-			snake.body.get(0).dy = 1;
-			snake.body.get(0).right = false;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = true;
-			snake.body.get(0).up = false;
-		}
-		else if(dir == 'U' && (!snake.body.get(0).down)) {
-			snake.body.get(0).dx = 0;
-			snake.body.get(0).dy = -1;
-			snake.body.get(0).right = false;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = true;
-		}
-	}
-
   private void collisionHB(Snake h, Snake b) {
 		if(b.maxLength!=1) {
 			for(int i = 1;i < b.maxLength;i++) {
