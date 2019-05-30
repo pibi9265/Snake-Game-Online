@@ -16,5 +16,5 @@ bin폴더에서
 jar -cvfm client.jar ..\META-INF\manifest.mf .\snakegame\client .\snakegame\element
 
 
-bin 폴더에서
+*bin 폴더에서
 start rmiregistry 49154
