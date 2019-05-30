@@ -4,48 +4,53 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.nio.channels.SocketChannel;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
-import snakegame.server.ServerSender;
 import snakegame.element.Snake;
 import snakegame.element.SnakeSetDirImpl;
 import snakegame.element.SnakeSetDirInterface;
 import snakegame.element.Part;
 import snakegame.element.Apple;
-import snakegame.server.ServerAccepter;
 import snakegame.element.Board;
 
-public class ServerWindow {
-	public ServerSocket serverSocket;
+public class ServerWindow extends Thread{
 	public ArrayList<Socket> playerSockets;
-	public ArrayList<ServerSender> serverSenders;
-
 	private JFrame serverFrame;
+	public ArrayList<ObjectOutputStream> objectOutputStreams;
+	public ArrayList<ObjectInputStream> objectInputStreams;
 
 	public ArrayList<Snake> snakes;
 	public Apple apple;
 	public int curPlayer;
 
-	private ServerAccepter serverAccepter;
+	//private ServerAccepter serverAccepter;
 
 	private Random random;
+	public Boolean stopped;
 
+	private SnakeSetDirInterface ssdi;
+	
 	public ServerWindow() {
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		try {
 			// socket, reader, sender 초기화
 			int port = Board.DEFAULT_PORT;
-			serverSocket = new ServerSocket(port);
 			playerSockets = new ArrayList<Socket>();
-			serverSenders = new ArrayList<ServerSender>();
 
 			// server 프레임 생성
 			serverFrame = new JFrame();
@@ -65,11 +70,13 @@ public class ServerWindow {
 			apple = new Apple(Board.width / Board.grid - 2, Board.height / Board.grid - 2);
 			curPlayer = 0;
 
-			// sever accepter 생성
-			serverAccepter = new ServerAccepter(this);
-
 			// 나머지 변수 초기화
 			random = new Random();
+			stopped = true;
+
+			// rmi 변수 초기화
+			ssdi = new SnakeSetDirImpl(snakes);
+			Naming.rebind("rmi://" + Board.DEFAULT_ADDRESS + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName, ssdi);
 
 			// server 프레임 보이기 설정
 			serverFrame.setVisible(true);
@@ -80,18 +87,45 @@ public class ServerWindow {
 			e.printStackTrace();
 		}
 	}
-
-	public void start() {
-		try {
-			new Thread(serverAccepter).start();
-
-			SnakeSetDirInterface ssdi = new SnakeSetDirImpl(snakes);
-			Naming.rebind("rmi://" + Board.DEFAULT_ADDRESS + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName, ssdi);
-
-			while (true) {
-				try {
+	
+	synchronized public int addPlayer(Socket player) throws IOException
+	{
+		if(curPlayer >= Board.maxPlayer)
+			return -1;
+		
+		playerSockets.add(player);
+		objectOutputStreams.add(new ObjectOutputStream(player.getOutputStream()));
+		objectInputStreams.add(new ObjectInputStream(player.getInputStream()));
+        curPlayer++;
+        snakes.add(new Snake(1, 1));
+        
+        return 1;
+	}
+	
+	public Boolean isStopped()
+	{
+		return stopped;
+	}
+	
+	public void run() {
+		stopped = false;
+		while (!stopped) {
+			try {
+				synchronized(this)
+				{
 					if (curPlayer > 0) {
+						
 						for (int i = 0; i < curPlayer; i++) {
+							objectOutputStreams.get(i).writeObject(snakes);
+							objectOutputStreams.get(i).writeObject(apple);
+							objectOutputStreams.get(i).reset();
+						}
+						
+						for (int i = 0; i < curPlayer; i++) {
+							//char dirInput = objectInputStreams.get(i).readChar();
+							//setDir(snakes.get(i), dirInput);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							move(snakes.get(i));
 							shiftDir(snakes.get(i));
 						}
@@ -104,26 +138,24 @@ public class ServerWindow {
 							}
 						}
 						collisionHA(snakes, apple);
-						for (int i = 0; i < curPlayer; i++) {
-							serverSenders.get(i).sending();
-						}
 					}
-				} catch (IndexOutOfBoundsException e2) {
-					e2.printStackTrace();
-				} catch (NullPointerException e3) {
-					e3.printStackTrace();
-				} finally {
-					try {
-						Thread.sleep(Board.sleepTime);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+					else
+					{
+						stopped = true;
+						playerSockets.clear();
 					}
 				}
+				
+				Thread.sleep(Board.sleepTime);
+			} catch (IndexOutOfBoundsException e2) {
+				e2.printStackTrace();
+			} catch (NullPointerException e3) {
+				e3.printStackTrace();
+			} catch (InterruptedException e) {
+					e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (RemoteException e1) {
-			e1.printStackTrace();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
 		}
 	}
 

@@ -63,8 +63,9 @@ public class GameWindow implements KeyListener, WindowListener {
 		startFrame.setVisible(false);
 		gameFrame.setVisible(true);
 		gameFrame.requestFocus();
-
+		
 		clientReader = new ClientReader(socket, this, gameComponent);
+		
 		new Thread(clientReader).start();
 	}
 

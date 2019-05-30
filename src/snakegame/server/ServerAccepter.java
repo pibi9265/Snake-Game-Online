@@ -1,3 +1,4 @@
+/*
 package snakegame.server;
 
 import java.io.IOException;
@@ -49,3 +50,4 @@ public class ServerAccepter implements Runnable {
         stop = true;
     }
 }
+*/

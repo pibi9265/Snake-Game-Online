@@ -20,7 +20,8 @@ public class ClientReader implements Runnable {
     private int curPlayer;
     private ArrayList<Snake> snakes;
     private Apple apple;
-
+    private char dir;
+    
     public ClientReader(Socket socket,GameWindow gameWindow, GameComponent gameComponent) {
         try {
             objectInputStream = new ObjectInputStream(socket.getInputStream());
@@ -33,13 +34,17 @@ public class ClientReader implements Runnable {
         this.gameComponent = gameComponent;
         stop = false;
         curPlayer = 0;
-        snakes = new ArrayList<Snake>();
+        snakes = null;
         apple = null;
     }
 
-    public void run() {
+    @SuppressWarnings("unchecked")
+	public void run() {
         while (!stop) {
             try {
+            	objectOutputStream.writeChar(dir);
+                objectOutputStream.reset();
+                
                 if (objectInputStream != null) {
                     curPlayer = objectInputStream.readInt();
                     if(gameWindow.getId() == -1){
@@ -63,26 +68,23 @@ public class ClientReader implements Runnable {
                 e.printStackTrace();
                 threadStop();
             } finally {
-                try {
-                    Thread.sleep(Board.sleepTime/10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
             gameComponent.keyPressed = false;
-            curPlayer = 0;
-            snakes.clear();
-            apple = null;
         }
         try {
             objectInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        gameWindow.reset();
+        //gameWindow.reset();
     }
 
     public void threadStop(){
         stop = true;
+    }
+    
+    public void setDir(char dir)
+    {
+    	this.dir = dir;
     }
 }
