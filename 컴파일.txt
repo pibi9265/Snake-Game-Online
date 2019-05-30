@@ -4,22 +4,11 @@ javac -d ..\bin\ snakegame\element\*.java snakegame\server\*.java snakegame\clie
 
 *실행
 bin폴더에서
+start rmiregistry 50143
 java snakegame.server.ServerDo
 java snakegame.client.ClientDo
 
-*실행파일 만들기
-manifest파일(server) 변경하고
+* jar 파일 만들기 (실행파일)
 bin폴더에서
-jar -cvfm server.jar ..\META-INF\manifest.mf .\snakegame\server .\snakegame\element
-manifest파일(client) 변경하고
-bin폴더에서
-jar -cvfm client.jar ..\META-INF\manifest.mf .\snakegame\client .\snakegame\element
-
-
-*bin 폴더에서
-start rmiregistry 50144
-
-
-서버,클라 rmi 아이피값 현재 아이피로 바꾸기
-클라 rmi생성을 생성자가 아닌 버튼이 눌렸을때를 기준으로 바꾸게 만들기
-클라 게임화면 종료시 안꺼짐 예외처리 하기
+jar -cvfm server.jar ..\META-INF\server_manifest.mf .\snakegame\server .\snakegame\element
+jar -cvfm client.jar ..\META-INF\client_manifest.mf .\snakegame\client .\snakegame\element

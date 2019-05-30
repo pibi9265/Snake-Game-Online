@@ -7,10 +7,8 @@ import javax.swing.JTextArea;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.channels.SocketChannel;
 import java.io.IOException;
 
 import snakegame.element.Board;
@@ -19,14 +17,14 @@ import snakegame.client.GameWindow;
 public class StartWindow implements ActionListener {
     private JFrame startFrame;
     private JTextArea ipTextArea;
-    private JTextArea portTextArea;
+    //private JTextArea portTextArea;
     //private JTextArea playerTextArea;
 
     private GameWindow gameWindow;
 
     private Socket socket;
     private String address = Board.DEFAULT_ADDRESS;
-    private int port = Board.DEFAULT_PORT;
+    //private int port = Board.DEFAULT_PORT;
     
     public StartWindow() {
         // start 프레임 생성
@@ -46,11 +44,12 @@ public class StartWindow implements ActionListener {
         ipTextArea.setColumns(Board.ipTextAreaColumns);
         ipTextArea.setRows(Board.ipTextAreaRows);
         panel.add(ipTextArea);
-        // port text area 생성 & panel에 추가
+        /* port text area 생성 & panel에 추가
         portTextArea = new JTextArea(Integer.toString(port));
         portTextArea.setColumns(Board.portTextAreaColumns);
         portTextArea.setRows(Board.portTextAreaRows);
         panel.add(portTextArea);
+        */
         /* player text area 생성 & panel에 추가
         playerTextArea = new JTextArea(Integer.toString(2));
         playerTextArea.setColumns(Board.playerTextAreaColums);
@@ -65,8 +64,8 @@ public class StartWindow implements ActionListener {
         socket = null;
 
         // start 프레임 기본 설정
-        startFrame.setVisible(true);
-        startFrame.requestFocus();
+        //startFrame.setVisible(true);
+        //startFrame.requestFocus();
     }
 
     public JFrame getFrame(){
@@ -77,10 +76,11 @@ public class StartWindow implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
         try {
             address = ipTextArea.getText();
-            port = Integer.parseInt(portTextArea.getText());
-            socket = new Socket(address, port);
+            //port = Integer.parseInt(portTextArea.getText());
+            socket = new Socket(address, Board.DEFAULT_PORT);
             
             gameWindow.startGame(socket);
+            socket = null;
         } catch (UnknownHostException unknownHostException) {
             unknownHostException.printStackTrace();
         } catch (IOException ioException) {

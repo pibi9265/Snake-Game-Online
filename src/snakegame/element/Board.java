@@ -12,7 +12,7 @@ public class Board{
     public static int width = 800;
 	public static int height = 800;
 	public static int grid = 16;
-	public static int maxPlayer = 10;
+	public static int maxPlayer = 2;
 	public static String DEFAULT_ADDRESS = "127.0.0.1";
 	public static int DEFAULT_PORT = 50142;
 	public static int sleepTime = 50;

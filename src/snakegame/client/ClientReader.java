@@ -12,18 +12,20 @@ import snakegame.element.Apple;
 import snakegame.element.Board;
 
 public class ClientReader implements Runnable {
+    private Socket socket;
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
     private GameWindow gameWindow;
     private GameComponent gameComponent;
     private boolean stop;
-    private int curPlayer;
-    private ArrayList<Snake> snakes;
-    private Apple apple;
     private int id;
+    private int curPlayer;
+    public ArrayList<Snake> snakes;
+    public Apple apple;
 
     public ClientReader(Socket socket, GameWindow gameWindow, GameComponent gameComponent) {
         try {
+            this.socket = socket;
             objectInputStream = new ObjectInputStream(socket.getInputStream());
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
@@ -33,31 +35,25 @@ public class ClientReader implements Runnable {
         this.gameWindow = gameWindow;
         this.gameComponent = gameComponent;
         stop = false;
+        id = -1;
         curPlayer = 0;
         snakes = new ArrayList<Snake>();
         apple = null;
-        id = -1;
     }
 
-    // @SuppressWarnings("unchecked")
     public void run() {
         while (!stop) {
             try {
-                //objectOutputStream.writeChar(dir);
-                //objectOutputStream.reset();
-                if (objectInputStream != null) {
-                    curPlayer = objectInputStream.readInt();
-                    id = curPlayer; //// 나중에 수정하기
-                    if (id > Board.maxPlayer) {
-                        threadStop();
-                    } else {
-                        for (int i = 0; i < curPlayer; i++) {
-                            snakes.add((Snake)objectInputStream.readObject());
-                        }
-                        apple = (Apple) objectInputStream.readObject();
-
-                        gameComponent.paintGameComponents(snakes, apple);
-                    }
+                id = objectInputStream.readInt();
+                curPlayer = objectInputStream.readInt();
+                for (int i = 0; i < curPlayer; i++) {
+                    snakes.add((Snake)objectInputStream.readObject());
+                }
+                apple = (Apple) objectInputStream.readObject();
+                if (id >= Board.maxPlayer) {
+                    threadStop();
+                } else {
+                    gameComponent.paintGameComponents(snakes, apple);
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -66,21 +62,31 @@ public class ClientReader implements Runnable {
                 threadStop();
             } finally {
                 try {
+                    Thread.sleep(Board.sleepTime / 10);
+                    curPlayer = 0;
                     snakes.clear();
                     apple = null;
-                    Thread.sleep(Board.sleepTime / 10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            gameComponent.keyPressed = false;
-            id = -1;
         }
         try {
             objectInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        try {
+            objectOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        id = -1;
         gameWindow.reset();
     }
 

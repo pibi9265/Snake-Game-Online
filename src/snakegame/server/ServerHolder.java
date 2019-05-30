@@ -30,6 +30,7 @@ public class ServerHolder {
 			serverSocketChannel.configureBlocking(false);
 			selectionKey = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 			serverWindow = new ServerWindow();
+			serverWindow.start();
 			// roomList = new ArrayList<ServerWindow>();
 
 			/*
@@ -75,9 +76,6 @@ public class ServerHolder {
 		try {
 			player = serverSocketChannel.accept();
 			serverWindow.addPlayer(player.socket());
-			if(serverWindow.isStopped()){
-				serverWindow.start();
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

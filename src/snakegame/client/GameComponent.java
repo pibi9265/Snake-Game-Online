@@ -26,7 +26,7 @@ public class GameComponent extends JComponent{
 
     public void paintGameComponents(ArrayList<Snake> snakes, Apple apple){
         this.snakes = snakes;
-        this.apple = apple;
+		this.apple = apple;
 		repaint();
     }
 
@@ -35,9 +35,11 @@ public class GameComponent extends JComponent{
 		if(snakes!=null && apple!=null){
 			g.setColor(Color.black);
 			for(int i=0; i<snakes.size(); i++){
-				for(int j = 0;j < snakes.get(i).maxLength;j++) {
-					g.drawRect(snakes.get(i).body.get(j).x*Board.grid, snakes.get(i).body.get(j).y*Board.grid, Board.grid , Board.grid);
-					g.fillRect(snakes.get(i).body.get(j).x*Board.grid, snakes.get(i).body.get(j).y*Board.grid, Board.grid , Board.grid);
+				if(i < Board.maxPlayer){
+					for(int j = 0;j < snakes.get(i).maxLength;j++) {
+						g.drawRect(snakes.get(i).body.get(j).x*Board.grid, snakes.get(i).body.get(j).y*Board.grid, Board.grid , Board.grid);
+						g.fillRect(snakes.get(i).body.get(j).x*Board.grid, snakes.get(i).body.get(j).y*Board.grid, Board.grid , Board.grid);
+					}
 				}
 			}
 			g.setColor(Color.red);
@@ -45,5 +47,7 @@ public class GameComponent extends JComponent{
 			g.fillRect(apple.x*Board.grid, apple.y*Board.grid, Board.grid , Board.grid);
 			keyPressed = false;
 		}
+		snakes = null;
+		apple = null;
 	}
 }
