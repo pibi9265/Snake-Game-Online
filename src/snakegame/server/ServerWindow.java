@@ -39,12 +39,12 @@ public class ServerWindow extends Thread{
 	private SnakeSetDirInterface ssdi;
 	
 	public ServerWindow() {
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		try {
 			// socket, reader, sender 초기화
 			int port = Board.DEFAULT_PORT;
 			playerSockets = new ArrayList<Socket>();
+			objectOutputStreams = new ArrayList<ObjectOutputStream>();
+			objectInputStreams = new ArrayList<ObjectInputStream>();
 
 			// server 프레임 생성
 			serverFrame = new JFrame();
@@ -82,18 +82,16 @@ public class ServerWindow extends Thread{
 		}
 	}
 	
-	synchronized public int addPlayer(Socket player) throws IOException
-	{
-		if(curPlayer >= Board.maxPlayer)
+	synchronized public int addPlayer(Socket player) throws IOException {
+		if(curPlayer >= Board.maxPlayer){
 			return -1;
-		
+		}
 		playerSockets.add(player);
 		objectOutputStreams.add(new ObjectOutputStream(player.getOutputStream()));
 		objectInputStreams.add(new ObjectInputStream(player.getInputStream()));
-        curPlayer++;
-        snakes.add(new Snake(1, 1));
-        
-        return 1;
+    curPlayer++;
+    snakes.add(new Snake(1, 1));
+    return 1;
 	}
 	
 	public Boolean isStopped()
@@ -108,18 +106,16 @@ public class ServerWindow extends Thread{
 				synchronized(this)
 				{
 					if (curPlayer > 0) {
-						
 						for (int i = 0; i < curPlayer; i++) {
-							objectOutputStreams.get(i).writeObject(snakes);
+							objectOutputStreams.get(i).writeInt(curPlayer);
+							//objectOutputStreams.get(i).writeObject(snakes);
+							for(int j = 0; j < curPlayer; j ++){
+								objectOutputStreams.get(j).writeObject(snakes.get(j));
+							}
 							objectOutputStreams.get(i).writeObject(apple);
 							objectOutputStreams.get(i).reset();
 						}
-						
 						for (int i = 0; i < curPlayer; i++) {
-							//char dirInput = objectInputStreams.get(i).readChar();
-							//setDir(snakes.get(i), dirInput);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							move(snakes.get(i));
 							shiftDir(snakes.get(i));
 						}
@@ -139,7 +135,6 @@ public class ServerWindow extends Thread{
 						playerSockets.clear();
 					}
 				}
-				
 				Thread.sleep(Board.sleepTime);
 			} catch (IndexOutOfBoundsException e2) {
 				e2.printStackTrace();

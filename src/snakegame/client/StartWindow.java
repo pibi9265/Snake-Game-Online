@@ -63,10 +63,6 @@ public class StartWindow implements ActionListener {
 
         // socket
         socket = null;
-        // 기본 address 지정
-        address = Board.DEFAULT_ADDRESS;
-        // 기본 port 지정
-        port = Board.DEFAULT_PORT;
 
         // start 프레임 기본 설정
         startFrame.setVisible(true);

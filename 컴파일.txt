@@ -17,4 +17,9 @@ jar -cvfm client.jar ..\META-INF\manifest.mf .\snakegame\client .\snakegame\elem
 
 
 *bin 폴더에서
-start rmiregistry 49154
+start rmiregistry 50144
+
+
+서버,클라 rmi 아이피값 현재 아이피로 바꾸기
+클라 rmi생성을 생성자가 아닌 버튼이 눌렸을때를 기준으로 바꾸게 만들기
+클라 게임화면 종료시 안꺼짐 예외처리 하기

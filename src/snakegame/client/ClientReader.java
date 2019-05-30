@@ -21,8 +21,8 @@ public class ClientReader implements Runnable {
     private ArrayList<Snake> snakes;
     private Apple apple;
     private char dir;
-    
-    public ClientReader(Socket socket,GameWindow gameWindow, GameComponent gameComponent) {
+
+    public ClientReader(Socket socket, GameWindow gameWindow, GameComponent gameComponent) {
         try {
             objectInputStream = new ObjectInputStream(socket.getInputStream());
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -34,28 +34,27 @@ public class ClientReader implements Runnable {
         this.gameComponent = gameComponent;
         stop = false;
         curPlayer = 0;
-        snakes = null;
+        snakes = new ArrayList<Snake>();
         apple = null;
     }
 
-    @SuppressWarnings("unchecked")
-	public void run() {
+    // @SuppressWarnings("unchecked")
+    public void run() {
         while (!stop) {
             try {
-            	objectOutputStream.writeChar(dir);
+                objectOutputStream.writeChar(dir);
                 objectOutputStream.reset();
-                
+
                 if (objectInputStream != null) {
                     curPlayer = objectInputStream.readInt();
-                    if(gameWindow.getId() == -1){
+                    if (gameWindow.getId() == -1) {
                         gameWindow.setId(curPlayer);
                     }
-                    if(gameWindow.getId() > Board.maxPlayer){
+                    if (gameWindow.getId() > Board.maxPlayer) {
                         threadStop();
-                    }
-                    else{
+                    } else {
                         for (int i = 0; i < curPlayer; i++) {
-                            snakes.add((Snake) objectInputStream.readObject());
+                            snakes.add((Snake)objectInputStream.readObject());
                         }
                         apple = (Apple) objectInputStream.readObject();
 
@@ -68,6 +67,13 @@ public class ClientReader implements Runnable {
                 e.printStackTrace();
                 threadStop();
             } finally {
+                try {
+                    snakes.clear();
+                    apple = null;
+                    Thread.sleep(Board.sleepTime / 10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             gameComponent.keyPressed = false;
         }
@@ -76,7 +82,7 @@ public class ClientReader implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //gameWindow.reset();
+        gameWindow.reset();
     }
 
     public void threadStop(){
