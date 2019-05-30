@@ -1,12 +1,8 @@
 package snakegame.server;
 
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.Naming;
-import java.rmi.RemoteException;
-import java.nio.channels.SocketChannel;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,8 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 import snakegame.element.Snake;
