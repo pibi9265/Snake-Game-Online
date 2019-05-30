@@ -20,7 +20,7 @@ public class ClientReader implements Runnable {
     private int curPlayer;
     private ArrayList<Snake> snakes;
     private Apple apple;
-    private char dir;
+    private int id;
 
     public ClientReader(Socket socket, GameWindow gameWindow, GameComponent gameComponent) {
         try {
@@ -36,6 +36,7 @@ public class ClientReader implements Runnable {
         curPlayer = 0;
         snakes = new ArrayList<Snake>();
         apple = null;
+        id = -1;
     }
 
     // @SuppressWarnings("unchecked")
@@ -46,10 +47,8 @@ public class ClientReader implements Runnable {
                 //objectOutputStream.reset();
                 if (objectInputStream != null) {
                     curPlayer = objectInputStream.readInt();
-                    if (gameWindow.getId() == -1) {
-                        gameWindow.setId(curPlayer);
-                    }
-                    if (gameWindow.getId() > Board.maxPlayer) {
+                    id = curPlayer; //// 나중에 수정하기
+                    if (id > Board.maxPlayer) {
                         threadStop();
                     } else {
                         for (int i = 0; i < curPlayer; i++) {
@@ -75,6 +74,7 @@ public class ClientReader implements Runnable {
                 }
             }
             gameComponent.keyPressed = false;
+            id = -1;
         }
         try {
             objectInputStream.close();
@@ -87,9 +87,8 @@ public class ClientReader implements Runnable {
     public void threadStop(){
         stop = true;
     }
-    
-    public void setDir(char dir)
-    {
-    	this.dir = dir;
+
+    public int getId(){
+        return id;
     }
 }

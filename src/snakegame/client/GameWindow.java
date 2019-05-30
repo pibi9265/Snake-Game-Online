@@ -25,8 +25,6 @@ public class GameWindow implements KeyListener, WindowListener {
 
 	private ClientReader clientReader;
 
-	private int id;
-
 	private SnakeSetDirInterface ssdi;
 
 	public GameWindow(JFrame startFrame) {
@@ -47,9 +45,6 @@ public class GameWindow implements KeyListener, WindowListener {
 
 		// Reader, Sender 초기화
 		clientReader = null;
-
-		// id 초기화
-		id = -1;
 
 		// ssdi 초기화
 		try {
@@ -73,9 +68,6 @@ public class GameWindow implements KeyListener, WindowListener {
 		// Reader 초기화
 		clientReader = null;
 
-		// id 초기화
-		id = -1;
-
 		gameFrame.setVisible(false);
 		startFrame.setVisible(true);
 		startFrame.requestFocus();
@@ -85,31 +77,23 @@ public class GameWindow implements KeyListener, WindowListener {
 		return gameFrame;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getId() {
-		return id;
-	}
-
 	@Override
 	public void keyPressed(KeyEvent e) {
 		try {
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed) {
-				ssdi.setDir(id, 'R');
+				ssdi.setDir(clientReader.getId(), 'R');
 				//clientSender.sending('R');
 				gameComponent.keyPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed) {
-				ssdi.setDir(id, 'L');
+				ssdi.setDir(clientReader.getId(), 'L');
 				//clientSender.sending('L');
 				gameComponent.keyPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed) {
-				ssdi.setDir(id, 'D');
+				ssdi.setDir(clientReader.getId(), 'D');
 				//clientSender.sending('D');
 				gameComponent.keyPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed) {
-				ssdi.setDir(id, 'U');
+				ssdi.setDir(clientReader.getId(), 'U');
 				//clientSender.sending('U');
 				gameComponent.keyPressed = true;
 			}
