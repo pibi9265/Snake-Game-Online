@@ -103,14 +103,15 @@ public class ServerWindow extends Thread{
 		stopped = false;
 		while (!stopped) {
 			try {
-				synchronized(this)
-				{
+				//synchronized(this)
+				//{
 					if (curPlayer > 0) {
 						for (int i = 0; i < curPlayer; i++) {
 							objectOutputStreams.get(i).writeInt(curPlayer);
 							//objectOutputStreams.get(i).writeObject(snakes);
 							for(int j = 0; j < curPlayer; j ++){
-								objectOutputStreams.get(j).writeObject(snakes.get(j));
+								objectOutputStreams.get(i).writeObject(snakes.get(j));
+								System.out.println("D"+i+"::"+j);
 							}
 							objectOutputStreams.get(i).writeObject(apple);
 							objectOutputStreams.get(i).reset();
@@ -134,7 +135,7 @@ public class ServerWindow extends Thread{
 						stopped = true;
 						playerSockets.clear();
 					}
-				}
+				//}
 				Thread.sleep(Board.sleepTime);
 			} catch (IndexOutOfBoundsException e2) {
 				e2.printStackTrace();

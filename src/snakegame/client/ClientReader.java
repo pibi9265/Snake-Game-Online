@@ -42,9 +42,8 @@ public class ClientReader implements Runnable {
     public void run() {
         while (!stop) {
             try {
-                objectOutputStream.writeChar(dir);
-                objectOutputStream.reset();
-
+                //objectOutputStream.writeChar(dir);
+                //objectOutputStream.reset();
                 if (objectInputStream != null) {
                     curPlayer = objectInputStream.readInt();
                     if (gameWindow.getId() == -1) {
