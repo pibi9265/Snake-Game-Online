@@ -14,7 +14,6 @@ import javax.swing.JFrame;
 
 import snakegame.client.GameComponent;
 import snakegame.client.ClientReader;
-//import snakegame.client.ClientSender;
 import snakegame.element.Board;
 import snakegame.element.SnakeSetDirInterface;
 
@@ -25,7 +24,6 @@ public class GameWindow implements KeyListener, WindowListener {
 	private JFrame startFrame;
 
 	private ClientReader clientReader;
-	// private ClientSender clientSender;
 
 	private int id;
 
@@ -49,14 +47,12 @@ public class GameWindow implements KeyListener, WindowListener {
 
 		// Reader, Sender 초기화
 		clientReader = null;
-		// clientSender = null;
 
 		// id 초기화
 		id = -1;
 
 		// ssdi 초기화
 		try {
-			//ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + Board.DEFAULT_ADDRESS + "/" + Board.serverName);
 			ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + Board.DEFAULT_ADDRESS + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName);
 		} catch (MalformedURLException | RemoteException | NotBoundException e) {
 			e.printStackTrace();
@@ -70,17 +66,13 @@ public class GameWindow implements KeyListener, WindowListener {
 
 		clientReader = new ClientReader(socket, this, gameComponent);
 		new Thread(clientReader).start();
-
-		// clientSender = new ClientSender(socket);
 	}
 
 	public void reset() {
 		// Reader 초기화
 		clientReader = null;
-		// Sender 초기화
-		// clientSender.reset();
-		// clientSender = null;
 
+		// id 초기화
 		id = -1;
 
 		gameFrame.setVisible(false);

@@ -15,7 +15,6 @@ import javax.swing.JLabel;
 import java.util.ArrayList;
 import java.util.Random;
 
-//import snakegame.server.ServerReader;
 import snakegame.server.ServerSender;
 import snakegame.element.Snake;
 import snakegame.element.SnakeSetDirImpl;
@@ -28,7 +27,6 @@ import snakegame.element.Board;
 public class ServerWindow {
 	public ServerSocket serverSocket;
 	public ArrayList<Socket> playerSockets;
-	// public ArrayList<ServerReader> serverReaders;
 	public ArrayList<ServerSender> serverSenders;
 
 	private JFrame serverFrame;
@@ -47,7 +45,6 @@ public class ServerWindow {
 			int port = Board.DEFAULT_PORT;
 			serverSocket = new ServerSocket(port);
 			playerSockets = new ArrayList<Socket>();
-			// serverReaders = new ArrayList<ServerReader>();
 			serverSenders = new ArrayList<ServerSender>();
 
 			// server 프레임 생성
@@ -59,8 +56,7 @@ public class ServerWindow {
 			JPanel panel = new JPanel();
 			serverFrame.add(panel);
 			// address text area 생성 & panel에 추가
-			String addresString = new String(
-					"Hello, Snakes! [" + InetAddress.getLocalHost().getHostAddress() + "] [" + port + "]");
+			String addresString = new String("Hello, Snakes! [" + InetAddress.getLocalHost().getHostAddress() + "] [" + port + "]");
 			JLabel ipLabel = new JLabel(addresString);
 			panel.add(ipLabel);
 
@@ -86,56 +82,49 @@ public class ServerWindow {
 	}
 
 	public void start() {
-		//////////////////////////////////////////////////////////////////////////////
 		try {
-		//////////////////////////////////////////////////////////////////////////////
+			new Thread(serverAccepter).start();
 
-		new Thread(serverAccepter).start();
+			SnakeSetDirInterface ssdi = new SnakeSetDirImpl(snakes);
+			Naming.rebind("rmi://" + Board.DEFAULT_ADDRESS + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName, ssdi);
 
-		SnakeSetDirInterface ssdi = new SnakeSetDirImpl(snakes);
-		Naming.rebind("rmi://" + Board.DEFAULT_ADDRESS + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName, ssdi);
-
-		while (true) {
-			try {
-				if (curPlayer > 0) {
-					for (int i = 0; i < curPlayer; i++) {
-						//setDir(snakes.get(i), serverReaders.get(i).getDirection());
-						move(snakes.get(i));
-						shiftDir(snakes.get(i));
-					}
-					for (int i = 0; i < curPlayer; i++) {
-						for (int j = 0; j < curPlayer; j++) {
-							collisionHB(snakes.get(i), snakes.get(j));
-							if (i != j) {
-								collisionHH(snakes.get(i), snakes.get(j));
+			while (true) {
+				try {
+					if (curPlayer > 0) {
+						for (int i = 0; i < curPlayer; i++) {
+							move(snakes.get(i));
+							shiftDir(snakes.get(i));
+						}
+						for (int i = 0; i < curPlayer; i++) {
+							for (int j = 0; j < curPlayer; j++) {
+								collisionHB(snakes.get(i), snakes.get(j));
+								if (i != j) {
+									collisionHH(snakes.get(i), snakes.get(j));
+								}
 							}
 						}
+						collisionHA(snakes, apple);
+						for (int i = 0; i < curPlayer; i++) {
+							serverSenders.get(i).sending();
+						}
 					}
-					collisionHA(snakes, apple);
-					for (int i = 0; i < curPlayer; i++) {
-						serverSenders.get(i).sending();
+				} catch (IndexOutOfBoundsException e2) {
+					e2.printStackTrace();
+				} catch (NullPointerException e3) {
+					e3.printStackTrace();
+				} finally {
+					try {
+						Thread.sleep(Board.sleepTime);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
-				}
-			} catch (IndexOutOfBoundsException e2) {
-				e2.printStackTrace();
-			} catch (NullPointerException e3) {
-				e3.printStackTrace();
-			} finally {
-				try {
-					Thread.sleep(Board.sleepTime);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
 			}
-		}
-
-		//////////////////////////////////////////////////////////////////////////////
 		} catch (RemoteException e1) {
 			e1.printStackTrace();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		//////////////////////////////////////////////////////////////////////////////
 	}
 
   private void move(Snake snake) {
@@ -167,43 +156,6 @@ public class ServerWindow {
 			}
 		}
 	}
-	
-	/*
-	public void setDir(Snake snake, char dir){
-		if(dir == 'R' && (!snake.body.get(0).left)) {
-			snake.body.get(0).dx = 1;
-			snake.body.get(0).dy = 0;
-			snake.body.get(0).right = true;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = false;
-		}
-		else if(dir == 'L' && (!snake.body.get(0).right)) {
-			snake.body.get(0).dx = -1;
-			snake.body.get(0).dy = 0;
-			snake.body.get(0).right = false;
-			snake.body.get(0).left = true;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = false;
-		}
-		else if(dir == 'D' && (!snake.body.get(0).up)) {
-			snake.body.get(0).dx = 0;
-			snake.body.get(0).dy = 1;
-			snake.body.get(0).right = false;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = true;
-			snake.body.get(0).up = false;
-		}
-		else if(dir == 'U' && (!snake.body.get(0).down)) {
-			snake.body.get(0).dx = 0;
-			snake.body.get(0).dy = -1;
-			snake.body.get(0).right = false;
-			snake.body.get(0).left = false;
-			snake.body.get(0).down = false;
-			snake.body.get(0).up = true;
-		}
-	}
-	*/
 
   private void collisionHB(Snake h, Snake b) {
 		if(b.maxLength!=1) {
@@ -261,11 +213,6 @@ public class ServerWindow {
 				s.body.get(s.maxLength-1).x -= s.body.get(s.maxLength-1).dx;
 				s.body.get(s.maxLength-1).y -= s.body.get(s.maxLength-1).dy;
 				check = true;
-				/* 레벨업 기능
-				if(s.maxLength > 10) {
-					s.updateLevel();
-				}
-				*/
 			}
 		}
 
