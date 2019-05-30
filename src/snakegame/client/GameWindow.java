@@ -4,30 +4,39 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
 import snakegame.client.GameComponent;
 import snakegame.client.ClientReader;
+import snakegame.element.Apple;
 import snakegame.element.Board;
+import snakegame.element.Snake;
 import snakegame.element.SnakeSetDirInterface;
 
-public class GameWindow implements KeyListener, WindowListener {
+public class GameWindow implements KeyListener, WindowListener, Runnable {
 	private JFrame gameFrame;
 	private GameComponent gameComponent;
-
 	private JFrame startFrame;
 
-	private ClientReader clientReader;
+	private ObjectInputStream objectInputStream;
+    private ObjectOutputStream objectOutputStream;
 
-
-	private int id;
-
+	private int curPlayer;
+	private boolean stop;
+	private ArrayList<Snake> snakes;
+	private Apple apple;
+	private char dir;
+	
 	private SnakeSetDirInterface ssdi;
 	
 	public GameWindow(JFrame startFrame) {
@@ -44,12 +53,12 @@ public class GameWindow implements KeyListener, WindowListener {
 		gameFrame.getContentPane().add(gameComponent);
 
 		// start 프레임 지정
-		this.startFrame = startFrame;
-
-		// Reader, Sender 초기화
-		clientReader = null;
+		this.startFrame = startFrame;		
 		
-		id = -1;
+		curPlayer = -1;
+		stop = false;
+		snakes = null;
+		apple = null;
 		
 		try {
 			ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + Board.DEFAULT_ADDRESS + ":" + (Board.DEFAULT_PORT+2) + "/" + Board.serverName);
@@ -64,16 +73,34 @@ public class GameWindow implements KeyListener, WindowListener {
 		gameFrame.setVisible(true);
 		gameFrame.requestFocus();
 		
-		clientReader = new ClientReader(socket, this, gameComponent);
-		
-		new Thread(clientReader).start();
+		new Thread(this).start();
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public void run() {
+		 while (!stop) {
+	            try {
+	            	objectOutputStream.writeChar(dir);
+	                objectOutputStream.reset();
+	                
+	                if (objectInputStream != null) {
+	                	curPlayer = objectInputStream.readInt();
+	                    snakes = (ArrayList<Snake>) objectInputStream.readObject();
+	                    apple = (Apple) objectInputStream.readObject();
+	                    gameComponent.paintGameComponents(snakes, apple);
+	                }
+	            } catch (ClassNotFoundException e) {
+	                e.printStackTrace();
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            } finally {
+	            }
+	            gameComponent.keyPressed = false;
+	        }
+	}
+	
 	public void reset() {
-		// Reader 초기화
-		clientReader = null;
-
-		id = -1;
+		curPlayer = -1;
 		
 		gameFrame.setVisible(false);
 		startFrame.setVisible(true);
@@ -85,27 +112,27 @@ public class GameWindow implements KeyListener, WindowListener {
 	}
 
 	public void setId(int id) {
-		this.id = id;
+		this.curPlayer = id;
 	}
 
 	public int getId() {
-		return id;
+		return curPlayer;
 	}
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		try {
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed) {
-				ssdi.setDir(id, 'R');
+				ssdi.setDir(curPlayer, 'R');
 				gameComponent.keyPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed) {
-				ssdi.setDir(id, 'L');
+				ssdi.setDir(curPlayer, 'L');
 				gameComponent.keyPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed) {
-				ssdi.setDir(id, 'D');
+				ssdi.setDir(curPlayer, 'D');
 				gameComponent.keyPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed) {
-				ssdi.setDir(id, 'U');
+				ssdi.setDir(curPlayer, 'U');
 				gameComponent.keyPressed = true;
 			}
 		} catch (RemoteException e1) {
@@ -115,10 +142,9 @@ public class GameWindow implements KeyListener, WindowListener {
 	}
 	public void keyTyped(KeyEvent e) {}
 	public void keyReleased(KeyEvent e) {}
-
 	@Override
 	public void windowClosing(WindowEvent e) {
-		clientReader.threadStop();
+		//clientReader.threadStop();
 	}
 	public void windowClosed(WindowEvent e) {}
 	public void windowOpened(WindowEvent e) {}

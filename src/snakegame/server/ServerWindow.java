@@ -116,6 +116,7 @@ public class ServerWindow extends Thread{
 					if (curPlayer > 0) {
 						
 						for (i = 0; i < curPlayer; i++) {
+							objectOutputStreams.get(i).writeInt(i+1);
 							objectOutputStreams.get(i).writeObject(snakes);
 							objectOutputStreams.get(i).writeObject(apple);
 							objectOutputStreams.get(i).reset();

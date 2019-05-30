@@ -33,7 +33,7 @@ public class ClientReader implements Runnable {
         this.gameWindow = gameWindow;
         this.gameComponent = gameComponent;
         stop = false;
-        curPlayer = 0;
+        curPlayer = -1;
         snakes = null;
         apple = null;
     }
@@ -46,6 +46,7 @@ public class ClientReader implements Runnable {
                 objectOutputStream.reset();
                 
                 if (objectInputStream != null) {
+                	curPlayer = objectInputStream.readInt();
                     snakes = (ArrayList<Snake>) objectInputStream.readObject();
                     apple = (Apple) objectInputStream.readObject();
                     gameComponent.paintGameComponents(snakes, apple);
