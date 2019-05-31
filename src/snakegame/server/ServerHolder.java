@@ -38,10 +38,10 @@ public class ServerHolder extends Thread{
 	ArrayList<ServerWindow> roomList;
 	public int Rooms = 10;
 	
-	final String runRoot = "C:/Users/cjs/Desktop/java-eclipse/library/07주차/07주차/bin/";  // root change : your system root
-	final String ksName = runRoot + ".ketstore/SSLSocketServerKey";
-	char keyStorePass[] = "123456".toCharArray();
-	char keyPass[] = "123456".toCharArray();
+	final String runRoot = "D:/Users/HyukWonLee/Desktop/JAVA_PROJECT_SSL/SNAKE_GAME/bin/";  // root change : your system root
+	final String ksName = runRoot + ".keystore/SSLSocketServerKey";
+	char keyStorePass[] = "3053919".toCharArray();
+	char keyPass[] = "3053919".toCharArray();
 	
 	void startServer() {
 		try {

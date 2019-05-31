@@ -22,7 +22,6 @@ public class ClientReader implements Runnable {
     private GameComponent gameComponent;
     private boolean stop;
     private int id;
-    private int curPlayer;
     public ArrayList<Snake> snakes;
     public Apple apple;
 
@@ -39,19 +38,16 @@ public class ClientReader implements Runnable {
         this.gameComponent = gameComponent;
         stop = false;
         id = -1;
-        curPlayer = 0;
         snakes = new ArrayList<Snake>();
         apple = null;
     }
 
-    public void run() {
+    @SuppressWarnings("unchecked")
+	public void run() {
         while (!stop) {
             try {
                 id = objectInputStream.readInt();
-                curPlayer = objectInputStream.readInt();
-                for (int i = 0; i < curPlayer; i++) {
-                    snakes.add((Snake)objectInputStream.readObject());
-                }
+                snakes = (ArrayList<Snake>)objectInputStream.readObject();
                 apple = (Apple) objectInputStream.readObject();
                 if (id >= Board.maxPlayer) {
                     threadStop();
@@ -64,14 +60,10 @@ public class ClientReader implements Runnable {
                 e.printStackTrace();
                 threadStop();
             } finally {
-                try {
-                    Thread.sleep(Board.sleepTime / 10);
-                    curPlayer = 0;
-                    snakes.clear();
-                    apple = null;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                //Thread.sleep(Board.sleepTime / 10);
+				//curPlayer = 0;
+				//snakes.clear();
+				//apple = null;
             }
         }
         try {

@@ -65,7 +65,7 @@ public class StartWindow implements ActionListener {
 
         // socket
         System.setProperty("javax.net.ssl.trustStore", "trustedcerts");
-        System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+        System.setProperty("javax.net.ssl.trustStorePassword", "3053919");
         sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
         sslSocket = null;
         

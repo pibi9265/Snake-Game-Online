@@ -138,10 +138,7 @@ public class ServerWindow extends Thread {
 				if (curPlayer > 0) {
 					for (id = 0; id < curPlayer; id++) {
 						objectOutputStreams.get(id).writeInt(id);
-						objectOutputStreams.get(id).writeInt(curPlayer);
-						for (int j = 0; j < curPlayer; j++) {
-							objectOutputStreams.get(id).writeObject(snakes.get(j));
-						}
+						objectOutputStreams.get(id).writeObject(snakes);
 						objectOutputStreams.get(id).writeObject(apple);
 						objectOutputStreams.get(id).reset();
 						if(id >= Board.maxPlayer){
