@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import javax.net.ssl.SSLSocket;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -22,7 +23,7 @@ import snakegame.element.Apple;
 import snakegame.element.Board;
 
 public class ServerWindow extends Thread {
-	public ArrayList<Socket> playerSockets;
+	public ArrayList<SSLSocket> playerSockets;
 	private JFrame serverFrame;
 	public ArrayList<ObjectOutputStream> objectOutputStreams;
 	public ArrayList<ObjectInputStream> objectInputStreams;
@@ -42,35 +43,35 @@ public class ServerWindow extends Thread {
 
 	public ServerWindow() {
 		try {
-			// socket, reader, sender 초기화
-			playerSockets = new ArrayList<Socket>();
+			// socket, reader, sender 珥덇린�솕
+			playerSockets = new ArrayList<SSLSocket>();
 			objectOutputStreams = new ArrayList<ObjectOutputStream>();
 			objectInputStreams = new ArrayList<ObjectInputStream>();
 
-			// server 프레임 생성
+			// server �봽�젅�엫 �깮�꽦
 			serverFrame = new JFrame();
 			serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			serverFrame.setSize(Board.serverFrameWidth, Board.serverFrameHeight);
 			serverFrame.setResizable(false);
-			// panel 생성
+			// panel �깮�꽦
 			JPanel panel = new JPanel();
 			serverFrame.add(panel);
-			// address text area 생성 & panel에 추가
+			// address text area �깮�꽦 & panel�뿉 異붽�
 			String addresString = new String("Hello, Snakes! [" + InetAddress.getLocalHost().getHostAddress() + "]");
 			JLabel label = new JLabel(addresString);
 			panel.add(label);
 
-			// snake, apple 초기화
+			// snake, apple 珥덇린�솕
 			snakes = new ArrayList<Snake>();
 			apple = new Apple(Board.width / Board.grid - 2, Board.height / Board.grid - 2);
 			curPlayer = 0;
 
-			// 나머지 변수 초기화
+			// �굹癒몄� 蹂��닔 珥덇린�솕
 			random = new Random();
 			stop = false;
 			id = -1;
 
-			// rmi 변수 초기화
+			// rmi 蹂��닔 珥덇린�솕
 			ssdi = new SnakeSetDirImpl(snakes);
 			try{
 				Naming.rebind("rmi://" + InetAddress.getLocalHost().getHostAddress() + ":" + (Board.DEFAULT_PORT + 1) + "/" + Board.serverName, ssdi);
@@ -80,22 +81,27 @@ public class ServerWindow extends Thread {
 				stop = true;
 			}
 
-			// server 프레임 보이기 설정
+			// server �봽�젅�엫 蹂댁씠湲� �꽕�젙
 			serverFrame.setVisible(true);
 			serverFrame.requestFocus();
 		}
-		// 예외처리
+		// �삁�쇅泥섎━
 		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	synchronized public void addPlayer(Socket player) throws IOException {
+	synchronized public int addPlayer(SSLSocket player) throws IOException {
+		if(curPlayer >= Board.maxPlayer)
+		{
+			return -1;
+		}
 		playerSockets.add(player);
 		objectOutputStreams.add(new ObjectOutputStream(player.getOutputStream()));
 		objectInputStreams.add(new ObjectInputStream(player.getInputStream()));
 		curPlayer++;
 		snakes.add(new Snake(1, 1));
+		return 1;
 	}
 
 	synchronized public void delPlayer() {
@@ -120,7 +126,12 @@ public class ServerWindow extends Thread {
 		snakes.remove(id);
 		curPlayer--;
 	}
-
+	
+	synchronized public boolean isStopped()
+	{
+		return stop;
+	}
+	
 	public void run() {
 		while (!stop) {
 			try {

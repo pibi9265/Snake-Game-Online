@@ -1,5 +1,6 @@
 package snakegame.server;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -7,99 +8,89 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.security.KeyStore;
+import java.util.ArrayList;
 //import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
 import snakegame.element.Board;
 
-public class ServerHolder {
+public class ServerHolder extends Thread{
+	KeyStore ks;
+	KeyManagerFactory kmf;
+	SSLContext sc;
+	SSLServerSocketFactory sslServerFactory;
+	SSLServerSocket sslServerSocket;
+	
 	Selector selector;
 	SelectionKey selectionKey;
 	ServerSocketChannel serverSocketChannel;
 	ServerWindow serverWindow;
-	// ArrayList<ServerWindow> roomList;
-	// public int Rooms = 10;
-
+	ArrayList<ServerWindow> roomList;
+	public int Rooms = 10;
+	
+	final String runRoot = "C:/Users/cjs/Desktop/java-eclipse/library/07주차/07주차/bin/";  // root change : your system root
+	final String ksName = runRoot + ".ketstore/SSLSocketServerKey";
+	char keyStorePass[] = "123456".toCharArray();
+	char keyPass[] = "123456".toCharArray();
+	
 	void startServer() {
 		try {
-			selector = Selector.open();
-			serverSocketChannel = ServerSocketChannel.open();
-			ServerSocket socket = serverSocketChannel.socket();
-			socket.bind(new InetSocketAddress(Board.DEFAULT_PORT));
-			serverSocketChannel.configureBlocking(false);
-			selectionKey = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-			serverWindow = new ServerWindow();
-			serverWindow.start();
-			// roomList = new ArrayList<ServerWindow>();
-
-			/*
-			 * for(int i=0; i<Rooms; i++) { ServerWindow room = new ServerWindow();
-			 * roomList.add(room); }
-			 */
+			ks = KeyStore.getInstance("JKS");
+			ks.load(new FileInputStream(ksName), keyStorePass);
+			
+			kmf = KeyManagerFactory.getInstance("SunX509");
+			kmf.init(ks, keyPass);
+			
+			sc = SSLContext.getInstance("TLS");
+			sc.init(kmf.getKeyManagers(), null, null);
+			
+			sslServerFactory = sc.getServerSocketFactory();
+			sslServerSocket = (SSLServerSocket) sslServerFactory.createServerSocket(Board.DEFAULT_PORT);
+			
+			roomList = new ArrayList<ServerWindow>();
+			 for(int i=0; i<Rooms; i++) { 
+				 ServerWindow room = new ServerWindow();
+				 roomList.add(room); 
+			 }
+			 
+			 new Thread(this).start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Thread thread = new Thread() {
-			public void run() {
-				while (true) {
-					try {
-						int keyCount = selector.select();
-
-						if (keyCount == 0) {
-							continue;
-						}
-
-						Set<SelectionKey> selectedKeys = selector.selectedKeys();
-						Iterator<SelectionKey> iterator = selectedKeys.iterator();
-
-						while (iterator.hasNext()) {
-							SelectionKey selectionKey = iterator.next();
-
-							if (selectionKey.isAcceptable()) {
-								accept(selectionKey);
-							}
-							iterator.remove();
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-		thread.start();
 	}
 
-	void accept(SelectionKey selectionKey) {
-		SocketChannel player;
-
+	public void run()
+	{
+		SSLSocket player;
 		try {
-			player = serverSocketChannel.accept();
-			serverWindow.addPlayer(player.socket());
+			player = (SSLSocket)sslServerSocket.accept();
+			
+			Iterator<ServerWindow> iter = roomList.iterator();
+			
+			while(iter.hasNext()) {
+				ServerWindow curServ = iter.next();
+				if(curServ.addPlayer(player) != -1)
+				{
+					if(curServ.isStopped())
+					{
+						curServ.start();
+					}
+					return;
+				}
+			}
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		/*
-    	try {
-			player = serverSocketChannel.accept();
-	    	Iterator<ServerWindow> iter = roomList.iterator();
-	    	
-	    	while(iter.hasNext()) {
-	    		ServerWindow curServ = iter.next();
-	    		if(curServ.addPlayer(player.socket()) != -1)
-	    		{
-	    			if(curServ.isStopped())
-	    			{
-	    				curServ.start();
-	    			}
-	    			return;
-	    		}
-	    	}
-	    //모든 방이 꽉 찼음을 플레이어에게 알리기
-    	} catch (Exception e){
-			e.printStackTrace();
-		}
-		*/
-    }
+	}
 }

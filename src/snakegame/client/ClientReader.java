@@ -2,6 +2,9 @@ package snakegame.client;
 
 import java.net.Socket;
 import java.util.ArrayList;
+
+import javax.net.ssl.SSLSocket;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -12,7 +15,7 @@ import snakegame.element.Apple;
 import snakegame.element.Board;
 
 public class ClientReader implements Runnable {
-    private Socket socket;
+    private SSLSocket socket;
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
     private GameWindow gameWindow;
@@ -23,7 +26,7 @@ public class ClientReader implements Runnable {
     public ArrayList<Snake> snakes;
     public Apple apple;
 
-    public ClientReader(Socket socket, GameWindow gameWindow, GameComponent gameComponent) {
+    public ClientReader(SSLSocket socket, GameWindow gameWindow, GameComponent gameComponent) {
         try {
             this.socket = socket;
             objectInputStream = new ObjectInputStream(socket.getInputStream());

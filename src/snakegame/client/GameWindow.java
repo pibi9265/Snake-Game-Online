@@ -10,6 +10,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import javax.net.ssl.SSLSocket;
 import javax.swing.JFrame;
 
 import snakegame.client.GameComponent;
@@ -27,31 +28,31 @@ public class GameWindow implements KeyListener, WindowListener {
 	private SnakeSetDirInterface ssdi;
 
 	public GameWindow(JFrame startFrame) {
-		// game 프레임 생성
+		// game �봽�젅�엫 �깮�꽦
 		gameFrame = new JFrame();
 		gameFrame.setSize(Board.width + (Board.grid / 2), Board.height + (Board.grid * 2));
 		gameFrame.setResizable(false);
-		// 프레임에 key 리스너 연결
+		// �봽�젅�엫�뿉 key 由ъ뒪�꼫 �뿰寃�
 		gameFrame.addKeyListener(this);
-		// 프레임에 윈도우 리스너 연결
+		// �봽�젅�엫�뿉 �쐢�룄�슦 由ъ뒪�꼫 �뿰寃�
 		gameFrame.addWindowListener(this);
-		// game component 생성 및 프레임에 추가
+		// game component �깮�꽦 諛� �봽�젅�엫�뿉 異붽�
 		gameComponent = new GameComponent();
 		gameFrame.getContentPane().add(gameComponent);
 
-		// start 프레임 지정
+		// start �봽�젅�엫 吏��젙
 		this.startFrame = startFrame;
 
-		// Reader, Sender 초기화
+		// Reader, Sender 珥덇린�솕
 		clientReader = null;
 	}
 
-	public void startGame(Socket socket) {
+	public void startGame(SSLSocket socket) {
 		startFrame.setVisible(false);
 		gameFrame.setVisible(true);
 		gameFrame.requestFocus();
 
-		// ssdi 초기화
+		// ssdi 珥덇린�솕
 		try {
 			ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + socket.getInetAddress().getHostAddress() + ":" + (Board.DEFAULT_PORT + 1) + "/" + Board.serverName);
 		} catch (MalformedURLException | RemoteException | NotBoundException e) {
@@ -63,7 +64,7 @@ public class GameWindow implements KeyListener, WindowListener {
 	}
 
 	public void reset() {
-		// Reader 초기화
+		// Reader 珥덇린�솕
 		clientReader = null;
 
 		gameFrame.setVisible(false);

@@ -2,6 +2,8 @@ package snakegame.client;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
@@ -22,48 +24,52 @@ public class StartWindow implements ActionListener {
 
     private GameWindow gameWindow;
 
-    private Socket socket;
+    SSLSocketFactory sslSocketFactory;
+    SSLSocket sslSocket;
     private String address = Board.DEFAULT_ADDRESS;
     //private int port = Board.DEFAULT_PORT;
     
     public StartWindow() {
-        // start 프레임 생성
+        // start �봽�젅�엫 �깮�꽦
         startFrame = new JFrame();
         startFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         startFrame.setSize(Board.startFrameWidth, Board.startFrameHeight);
         startFrame.setResizable(false);
-        // panel 생성
+        // panel �깮�꽦
         JPanel panel = new JPanel();
         startFrame.add(panel);
-        // start 버튼 생성 & panel에 추가
+        // start 踰꾪듉 �깮�꽦 & panel�뿉 異붽�
         JButton button = new JButton("Start");
         panel.add(button);
         button.addActionListener(this);
-        // address text area 생성 & panel에 추가
+        // address text area �깮�꽦 & panel�뿉 異붽�
         ipTextArea = new JTextArea(address);
         ipTextArea.setColumns(Board.ipTextAreaColumns);
         ipTextArea.setRows(Board.ipTextAreaRows);
         panel.add(ipTextArea);
-        /* port text area 생성 & panel에 추가
+        /* port text area �깮�꽦 & panel�뿉 異붽�
         portTextArea = new JTextArea(Integer.toString(port));
         portTextArea.setColumns(Board.portTextAreaColumns);
         portTextArea.setRows(Board.portTextAreaRows);
         panel.add(portTextArea);
         */
-        /* player text area 생성 & panel에 추가
+        /* player text area �깮�꽦 & panel�뿉 異붽�
         playerTextArea = new JTextArea(Integer.toString(2));
         playerTextArea.setColumns(Board.playerTextAreaColums);
         playerTextArea.setRows(Board.playerTextAreaRows);
         panel.add(playerTextArea);
         */
 
-        // game 창 생성
+        // game 李� �깮�꽦
         gameWindow = new GameWindow(startFrame);
 
         // socket
-        socket = null;
-
-        // start 프레임 기본 설정
+        System.setProperty("javax.net.ssl.trustStore", "trustedcerts");
+        System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+        sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        sslSocket = null;
+        
+        // start �봽�젅�엫 湲곕낯 �꽕�젙
         //startFrame.setVisible(true);
         //startFrame.requestFocus();
     }
@@ -77,10 +83,13 @@ public class StartWindow implements ActionListener {
         try {
             address = ipTextArea.getText();
             //port = Integer.parseInt(portTextArea.getText());
-            socket = new Socket(address, Board.DEFAULT_PORT);
+            sslSocket = (SSLSocket) sslSocketFactory.createSocket(address, Board.DEFAULT_PORT);
             
-            gameWindow.startGame(socket);
-            socket = null;
+            String[] supported = sslSocket.getSupportedCipherSuites();
+            sslSocket.setEnabledCipherSuites(supported);
+            sslSocket.startHandshake();
+            
+            gameWindow.startGame(sslSocket);
         } catch (UnknownHostException unknownHostException) {
             unknownHostException.printStackTrace();
         } catch (IOException ioException) {
