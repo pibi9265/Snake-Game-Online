@@ -1,7 +1,9 @@
 package snakegame.server;
 
 import java.net.Socket;
+import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.net.InetAddress;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -24,7 +26,6 @@ import snakegame.element.Board;
 
 public class ServerWindow extends Thread {
 	public ArrayList<SSLSocket> playerSockets;
-	private JFrame serverFrame;
 	public ArrayList<ObjectOutputStream> objectOutputStreams;
 	public ArrayList<ObjectInputStream> objectInputStreams;
 
@@ -38,57 +39,26 @@ public class ServerWindow extends Thread {
 	public Boolean stop;
 
 	private int id;
-
+	private int roomNumber;
+	
 	private SnakeSetDirInterface ssdi;
 
-	public ServerWindow() {
-		try {
-			// socket, reader, sender 珥덇린�솕
-			playerSockets = new ArrayList<SSLSocket>();
-			objectOutputStreams = new ArrayList<ObjectOutputStream>();
-			objectInputStreams = new ArrayList<ObjectInputStream>();
+	public ServerWindow(int roomNumber) {
+		// socket, reader, sender 珥덇린�솕
+		playerSockets = new ArrayList<SSLSocket>();
+		objectOutputStreams = new ArrayList<ObjectOutputStream>();
+		objectInputStreams = new ArrayList<ObjectInputStream>();
 
-			// server �봽�젅�엫 �깮�꽦
-			serverFrame = new JFrame();
-			serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			serverFrame.setSize(Board.serverFrameWidth, Board.serverFrameHeight);
-			serverFrame.setResizable(false);
-			// panel �깮�꽦
-			JPanel panel = new JPanel();
-			serverFrame.add(panel);
-			// address text area �깮�꽦 & panel�뿉 異붽�
-			String addresString = new String("Hello, Snakes! [" + InetAddress.getLocalHost().getHostAddress() + "]");
-			JLabel label = new JLabel(addresString);
-			panel.add(label);
+		// snake, apple 珥덇린�솕
+		snakes = new ArrayList<Snake>();
+		apple = new Apple(Board.width / Board.grid - 2, Board.height / Board.grid - 2);
+		curPlayer = 0;
 
-			// snake, apple 珥덇린�솕
-			snakes = new ArrayList<Snake>();
-			apple = new Apple(Board.width / Board.grid - 2, Board.height / Board.grid - 2);
-			curPlayer = 0;
-
-			// �굹癒몄� 蹂��닔 珥덇린�솕
-			random = new Random();
-			stop = false;
-			id = -1;
-
-			// rmi 蹂��닔 珥덇린�솕
-			ssdi = new SnakeSetDirImpl(snakes);
-			try{
-				Naming.rebind("rmi://" + InetAddress.getLocalHost().getHostAddress() + ":" + (Board.DEFAULT_PORT + 1) + "/" + Board.serverName, ssdi);
-			} catch(IOException e){
-				e.printStackTrace();
-				label.setText("RMI Error");
-				stop = true;
-			}
-
-			// server �봽�젅�엫 蹂댁씠湲� �꽕�젙
-			serverFrame.setVisible(true);
-			serverFrame.requestFocus();
-		}
-		// �삁�쇅泥섎━
-		catch (IOException e) {
-			e.printStackTrace();
-		}
+		// �굹癒몄� 蹂��닔 珥덇린�솕
+		random = new Random();
+		stop = true;
+		id = -1;
+		this.roomNumber = roomNumber;
 	}
 
 	synchronized public int addPlayer(SSLSocket player) throws IOException {
@@ -104,7 +74,7 @@ public class ServerWindow extends Thread {
 		return 1;
 	}
 
-	synchronized public void delPlayer() {
+	synchronized public void delPlayer() throws RemoteException {
 		try {
 			objectOutputStreams.get(id).close();
 		} catch (IOException e) {
@@ -133,31 +103,32 @@ public class ServerWindow extends Thread {
 	}
 	
 	public void run() {
+		stop = false;
 		while (!stop) {
 			try {
-				if (curPlayer > 0) {
-					for (id = 0; id < curPlayer; id++) {
-						objectOutputStreams.get(id).writeInt(id);
-						objectOutputStreams.get(id).writeObject(snakes);
-						objectOutputStreams.get(id).writeObject(apple);
-						objectOutputStreams.get(id).reset();
-						if(id >= Board.maxPlayer){
-							delPlayer();
+				synchronized(this) {
+					if (curPlayer > 0) {
+						for (id = 0; id < curPlayer; id++) {
+							objectOutputStreams.get(id).writeInt(roomNumber);
+							objectOutputStreams.get(id).writeInt(id);
+							objectOutputStreams.get(id).writeObject(snakes);
+							objectOutputStreams.get(id).writeObject(apple);
+							objectOutputStreams.get(id).reset();
 						}
-					}
-					for (int i = 0; i < curPlayer; i++) {
-						move(snakes.get(i));
-						shiftDir(snakes.get(i));
-					}
-					for (int i = 0; i < curPlayer; i++) {
-						for (int j = 0; j < curPlayer; j++) {
-							if (i != j) {
-								collisionHB(snakes.get(i), snakes.get(j));
-								collisionHH(snakes.get(i), snakes.get(j));
+						for (int i = 0; i < curPlayer; i++) {
+							move(snakes.get(i));
+							shiftDir(snakes.get(i));
+						}
+						for (int i = 0; i < curPlayer; i++) {
+							for (int j = 0; j < curPlayer; j++) {
+								if (i != j) {
+									collisionHB(snakes.get(i), snakes.get(j));
+									collisionHH(snakes.get(i), snakes.get(j));
+								}
 							}
 						}
+						collisionHA(snakes, apple);
 					}
-					collisionHA(snakes, apple);
 				}
 			} catch (IndexOutOfBoundsException e2) {
 				e2.printStackTrace();
@@ -165,10 +136,13 @@ public class ServerWindow extends Thread {
 				e3.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
-				delPlayer();
+				try {
+					delPlayer();
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
 			} finally {
 				try {
-					id = -1;
 					Thread.sleep(Board.sleepTime);
 				} catch (InterruptedException e) {
 					e.printStackTrace();

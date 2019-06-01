@@ -52,7 +52,6 @@ public class GameWindow implements KeyListener, WindowListener {
 		gameFrame.setVisible(true);
 		gameFrame.requestFocus();
 
-		// ssdi 珥덇린�솕
 		try {
 			ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + socket.getInetAddress().getHostAddress() + ":" + (Board.DEFAULT_PORT + 1) + "/" + Board.serverName);
 		} catch (MalformedURLException | RemoteException | NotBoundException e) {
@@ -80,16 +79,16 @@ public class GameWindow implements KeyListener, WindowListener {
 	public void keyPressed(KeyEvent e) {
 		try {
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed && clientReader.getId() != -1) {
-				ssdi.setDir(clientReader.getId(), 'R');
+				ssdi.setDir(clientReader.getRoomNumber(), clientReader.getId(), 'R');
 				gameComponent.keyPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed && clientReader.getId() != -1) {
-				ssdi.setDir(clientReader.getId(), 'L');
+				ssdi.setDir(clientReader.getRoomNumber(), clientReader.getId(), 'L');
 				gameComponent.keyPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed && clientReader.getId() != -1) {
-				ssdi.setDir(clientReader.getId(), 'D');
+				ssdi.setDir(clientReader.getRoomNumber(), clientReader.getId(), 'D');
 				gameComponent.keyPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed && clientReader.getId() != -1) {
-				ssdi.setDir(clientReader.getId(), 'U');
+				ssdi.setDir(clientReader.getRoomNumber(), clientReader.getId(), 'U');
 				gameComponent.keyPressed = true;
 			}
 		} catch (RemoteException e1) {

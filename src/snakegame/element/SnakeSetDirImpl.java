@@ -4,18 +4,23 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+import snakegame.server.ServerWindow;
+
 public class SnakeSetDirImpl extends UnicastRemoteObject implements SnakeSetDirInterface{
     private static final long serialVersionUID = 1L;
 
-    private ArrayList<Snake> snakes;
+    public ArrayList<ServerWindow> rooms;
 
-    public SnakeSetDirImpl(ArrayList<Snake> snakes) throws RemoteException {
+    public SnakeSetDirImpl(ArrayList<ServerWindow> rooms) throws RemoteException {
         super();
-        this.snakes = snakes;
+        this.rooms = rooms;
     }
 
     @Override
-    public void setDir(int id, char dir) {
+    synchronized public void setDir(int roomNumber, int id, char dir) {
+    	ServerWindow room = rooms.get(roomNumber);
+    	ArrayList<Snake> snakes = room.snakes;
+    	
 		if(dir == 'R' && (!snakes.get(id).body.get(0).left)) {
 			snakes.get(id).body.get(0).dx = 1;
 			snakes.get(id).body.get(0).dy = 0;
