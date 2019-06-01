@@ -114,7 +114,6 @@ public class ServerHolder extends Thread{
 					{
 						curServ.start();
 					}
-					return;
 				}
 			}
 			

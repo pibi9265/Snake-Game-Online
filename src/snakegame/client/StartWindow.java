@@ -88,7 +88,7 @@ public class StartWindow implements ActionListener {
             
             String[] supported = sslSocket.getSupportedCipherSuites();
             sslSocket.setEnabledCipherSuites(supported);
-            sslSocket.startHandshake();
+            //sslSocket.startHandshake();
             
             gameWindow.startGame(sslSocket);
         } catch (UnknownHostException unknownHostException) {
