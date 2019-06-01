@@ -18,40 +18,39 @@ public class SnakeSetDirImpl extends UnicastRemoteObject implements SnakeSetDirI
 
     @Override
     synchronized public void setDir(int roomNumber, int id, char dir) {
-    	ServerWindow room = rooms.get(roomNumber);
-    	ArrayList<Snake> snakes = room.snakes;
+    	Snake snake = rooms.get(roomNumber).snakes.get(id);
     	
-		if(dir == 'R' && (!snakes.get(id).body.get(0).left)) {
-			snakes.get(id).body.get(0).dx = 1;
-			snakes.get(id).body.get(0).dy = 0;
-			snakes.get(id).body.get(0).right = true;
-			snakes.get(id).body.get(0).left = false;
-			snakes.get(id).body.get(0).down = false;
-			snakes.get(id).body.get(0).up = false;
+		if(dir == 'R' && (!snake.body.get(0).left)) {
+			snake.body.get(0).dx = 1;
+			snake.body.get(0).dy = 0;
+			snake.body.get(0).right = true;
+			snake.body.get(0).left = false;
+			snake.body.get(0).down = false;
+			snake.body.get(0).up = false;
 		}
-		else if(dir == 'L' && (!snakes.get(id).body.get(0).right)) {
-			snakes.get(id).body.get(0).dx = -1;
-			snakes.get(id).body.get(0).dy = 0;
-			snakes.get(id).body.get(0).right = false;
-			snakes.get(id).body.get(0).left = true;
-			snakes.get(id).body.get(0).down = false;
-			snakes.get(id).body.get(0).up = false;
+		else if(dir == 'L' && (!snake.body.get(0).right)) {
+			snake.body.get(0).dx = -1;
+			snake.body.get(0).dy = 0;
+			snake.body.get(0).right = false;
+			snake.body.get(0).left = true;
+			snake.body.get(0).down = false;
+			snake.body.get(0).up = false;
 		}
-		else if(dir == 'D' && (!snakes.get(id).body.get(0).up)) {
-			snakes.get(id).body.get(0).dx = 0;
-			snakes.get(id).body.get(0).dy = 1;
-			snakes.get(id).body.get(0).right = false;
-			snakes.get(id).body.get(0).left = false;
-			snakes.get(id).body.get(0).down = true;
-			snakes.get(id).body.get(0).up = false;
+		else if(dir == 'D' && (!snake.body.get(0).up)) {
+			snake.body.get(0).dx = 0;
+			snake.body.get(0).dy = 1;
+			snake.body.get(0).right = false;
+			snake.body.get(0).left = false;
+			snake.body.get(0).down = true;
+			snake.body.get(0).up = false;
 		}
-		else if(dir == 'U' && (!snakes.get(id).body.get(0).down)) {
-			snakes.get(id).body.get(0).dx = 0;
-			snakes.get(id).body.get(0).dy = -1;
-			snakes.get(id).body.get(0).right = false;
-			snakes.get(id).body.get(0).left = false;
-			snakes.get(id).body.get(0).down = false;
-			snakes.get(id).body.get(0).up = true;
+		else if(dir == 'U' && (!snake.body.get(0).down)) {
+			snake.body.get(0).dx = 0;
+			snake.body.get(0).dy = -1;
+			snake.body.get(0).right = false;
+			snake.body.get(0).left = false;
+			snake.body.get(0).down = false;
+			snake.body.get(0).up = true;
 		}
     }
 }
