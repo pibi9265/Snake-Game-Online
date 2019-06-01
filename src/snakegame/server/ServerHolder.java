@@ -102,30 +102,33 @@ public class ServerHolder extends Thread{
 
 	public void run()
 	{
-		try {
-			SSLSocket player = (SSLSocket)sslServerSocket.accept();
-			
-			Iterator<ServerWindow> iter = roomList.iterator();
-			while(iter.hasNext()) {
-				ServerWindow curServ = iter.next();
-				if(curServ.addPlayer(player) != -1)
-				{
-					if(curServ.isStopped())
+		while(true)
+		{
+			try {
+				SSLSocket player = (SSLSocket)sslServerSocket.accept();
+				
+				Iterator<ServerWindow> iter = roomList.iterator();
+				while(iter.hasNext()) {
+					ServerWindow curServ = iter.next();
+					if(curServ.addPlayer(player) != -1)
 					{
-						curServ.start();
+						if(curServ.isStopped())
+						{
+							curServ.start();
+						}
+						break;
 					}
-					break;
 				}
+				
+				/*
+				ServerWindow server = new ServerWindow();
+				server.addPlayer(player);
+				server.start();
+				*/
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			
-			/*
-			ServerWindow server = new ServerWindow();
-			server.addPlayer(player);
-			server.start();
-			*/
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

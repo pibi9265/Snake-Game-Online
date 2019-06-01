@@ -83,12 +83,12 @@ public class StartWindow implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
         try {
             address = ipTextArea.getText();
-            //port = Integer.parseInt(portTextArea.getText());
             sslSocket = (SSLSocket) sslSocketFactory.createSocket(address, Board.DEFAULT_PORT);
             
             String[] supported = sslSocket.getSupportedCipherSuites();
             sslSocket.setEnabledCipherSuites(supported);
-            //sslSocket.startHandshake();
+            sslSocket.startHandshake();
+            System.out.println("Socket making complete");
             
             gameWindow.startGame(sslSocket);
         } catch (UnknownHostException unknownHostException) {
