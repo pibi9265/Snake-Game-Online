@@ -1,12 +1,12 @@
-// ssl keystore 및 key 생성
+// ssl keystore 및 key 생성 (비번123456)
 // bin폴더에서
 keytool -genkey -keystore .\serverstore -keyalg RSA -storetype JKS
 
-// keystore에서 인증서 export하기
+// keystore에서 인증서 export하기 (비번123456)
 // bin폴더에서
 keytool -export -keystore serverstore -file certification.cer
 
-// client에서 keystore 생성하고 keystore애 인증서 import하기
+// client에서 keystore 생성하고 keystore애 인증서 import하기 (비번123456)
 // bin폴더에서
 keytool -import -keystore .\clientstore -file certification.cer
 
