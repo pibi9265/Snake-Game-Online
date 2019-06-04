@@ -4,7 +4,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -16,7 +15,7 @@ import snakegame.element.Board;
 import snakegame.element.SnakeControllerInterface;
 import snakegame.rmisslsocketfactory.RMISSLClientSocketFactory;
 
-public class GameWindow implements KeyListener, WindowListener {
+public class GameWindow implements Runnable, KeyListener, WindowListener {
 	private JFrame gameFrame;
 	private GameComponent gameComponent;
 
@@ -25,7 +24,9 @@ public class GameWindow implements KeyListener, WindowListener {
 	private Registry registry;
 	private SnakeControllerInterface snakeController;
 
-	private int index;
+	private int id;
+
+	private boolean stop;
 
 	public GameWindow(JFrame startFrame) {
 		// game 프레임 생성
@@ -48,7 +49,10 @@ public class GameWindow implements KeyListener, WindowListener {
 		snakeController = null;
 
 		// id 초기화
-		index = -1;
+		id = -1;
+
+		// stop 초기화
+		stop = false;
 	}
 
 	public void startGame(String address) {
@@ -58,23 +62,42 @@ public class GameWindow implements KeyListener, WindowListener {
 
 		// snakeController 생성
 		try {
-			registry = LocateRegistry.getRegistry(InetAddress.getLocalHost().getHostName(), Board.DEFAULT_PORT, new RMISSLClientSocketFactory());
+			registry = LocateRegistry.getRegistry(address, Board.DEFAULT_PORT, new RMISSLClientSocketFactory());
 			snakeController = (SnakeControllerInterface) registry.lookup(Board.snakeControllerName);
+			id = snakeController.addPlayer();
 		} catch (Exception e) {
 			e.printStackTrace();
 			reset();
-        }
+		}
+
+		new Thread(this).start();
+	}
+
+	@Override
+	public void run() {
+		while (!stop) {
+			try {
+				Thread.sleep(Board.sleepTime / 10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			try {
+				gameComponent.paintGameComponents(id, snakeController.getSnakes(), snakeController.getApple());
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void threadStop() {
+		stop = true;
 	}
 
 	public void reset() {
-		gameComponent.reset();
-
 		registry = null;
 		snakeController = null;
-
-		gameFrame.setVisible(false);
-		startFrame.setVisible(true);
-		startFrame.requestFocus();
+		id = -1;
+		stop = false;
 	}
 
 	public JFrame getFrame() {
@@ -84,17 +107,17 @@ public class GameWindow implements KeyListener, WindowListener {
 	@Override
 	public void keyPressed(KeyEvent keyEvent) {
 		try {
-			if (keyEvent.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed && index != -1) {
-				snakeController.setDir(index, 'R');
+			if (keyEvent.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed && id != -1) {
+				snakeController.setDir(id, 'R');
 				gameComponent.keyPressed = true;
-			} else if (keyEvent.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed && index != -1) {
-				snakeController.setDir(index, 'L');
+			} else if (keyEvent.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed && id != -1) {
+				snakeController.setDir(id, 'L');
 				gameComponent.keyPressed = true;
-			} else if (keyEvent.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed && index != -1) {
-				snakeController.setDir(index, 'D');
+			} else if (keyEvent.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed && id != -1) {
+				snakeController.setDir(id, 'D');
 				gameComponent.keyPressed = true;
-			} else if (keyEvent.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed && index != -1) {
-				snakeController.setDir(index, 'U');
+			} else if (keyEvent.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed && id != -1) {
+				snakeController.setDir(id, 'U');
 				gameComponent.keyPressed = true;
 			}
 		} catch (RemoteException remoteException) {
@@ -106,7 +129,25 @@ public class GameWindow implements KeyListener, WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent e) {
+		threadStop();
+		try {
+			Thread.sleep(Board.sleepTime / 10);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+		try {
+			snakeController.removePlayer(id);
+		} catch (RemoteException remoteException) {
+			remoteException.printStackTrace();
+		}
+
+		gameComponent.reset();
 		reset();
+
+		gameFrame.setVisible(false);
+		startFrame.setVisible(true);
+		startFrame.requestFocus();
 	}
 	public void windowClosed(WindowEvent e) {}
 	public void windowOpened(WindowEvent e) {}

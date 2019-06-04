@@ -52,9 +52,9 @@ public class ServerWindow extends Thread {
 			// 나머지 변수 초기화
 			random = new Random();
 
-			// server 프레임 보이기 설정
-			serverFrame.setVisible(true);
-			serverFrame.requestFocus();
+			// server 프레임 보이기 설정 (ServerDo로 옮김)
+			//serverFrame.setVisible(true);
+			//serverFrame.requestFocus();
 		}
 		// 예외처리
 		catch (IOException e) {
@@ -94,6 +94,10 @@ public class ServerWindow extends Thread {
 			label.setText("RMI Error");
 			return;
         }
+	}
+
+	public JFrame getFrame() {
+		return serverFrame;
 	}
 
   private void move(Snake snake) {
