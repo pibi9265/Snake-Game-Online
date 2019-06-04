@@ -22,6 +22,7 @@ public class GameWindow implements KeyListener, WindowListener {
 
 	private JFrame startFrame;
 
+	private Registry registry;
 	private SnakeControllerInterface snakeController;
 
 	private int index;
@@ -43,6 +44,7 @@ public class GameWindow implements KeyListener, WindowListener {
 		this.startFrame = startFrame;
 
 		// snakeController 초기화
+		registry = null;
 		snakeController = null;
 
 		// id 초기화
@@ -56,7 +58,7 @@ public class GameWindow implements KeyListener, WindowListener {
 
 		// snakeController 생성
 		try {
-			Registry registry = LocateRegistry.getRegistry(InetAddress.getLocalHost().getHostName(), Board.DEFAULT_PORT, new RMISSLClientSocketFactory());
+			registry = LocateRegistry.getRegistry(InetAddress.getLocalHost().getHostName(), Board.DEFAULT_PORT, new RMISSLClientSocketFactory());
 			snakeController = (SnakeControllerInterface) registry.lookup(Board.snakeControllerName);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -67,6 +69,7 @@ public class GameWindow implements KeyListener, WindowListener {
 	public void reset() {
 		gameComponent.reset();
 
+		registry = null;
 		snakeController = null;
 
 		gameFrame.setVisible(false);
