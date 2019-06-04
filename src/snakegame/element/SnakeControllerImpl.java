@@ -30,28 +30,6 @@ public class SnakeControllerImpl extends UnicastRemoteObject implements SnakeCon
         size = 0;
     }
 
-    /*
-    @Override
-    public String sayHello() {
-        return "Hello World!";
-    }
-
-    public static void main(String args[]) {
-        try {
-            Registry registry = LocateRegistry.createRegistry(PORT, new RMISSLClientSocketFactory(), new RMISSLServerSocketFactory());
-
-            SnakeControlImpl obj = new SnakeControlImpl();
-
-            registry.bind("HelloServer", obj);
-
-            System.out.println("HelloServer bound in registry");
-        } catch (Exception e) {
-            System.out.println("HelloImpl err: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    */
-
     @Override
     public Snake getSnake(int index) {
         return snakes.get(index);
