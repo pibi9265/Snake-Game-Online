@@ -1,8 +1,10 @@
 package snakegame.server;
 
+import snakegame.server.ServerWindow;
+
 public class ServerDo {
     public static void main(String[] args) {
-			ServerHolder serverHolder = new ServerHolder();
-			serverHolder.startServer();
-		}
+		ServerWindow serverWindow = new ServerWindow();
+		serverWindow.start();
+	}
 }

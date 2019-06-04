@@ -4,18 +4,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
+import java.net.InetAddress;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 import javax.swing.JFrame;
 
 import snakegame.client.GameComponent;
-import snakegame.client.ClientReader;
 import snakegame.element.Board;
-import snakegame.element.SnakeSetDirInterface;
+import snakegame.element.SnakeControllerInterface;
+import snakegame.rmisslsocketfactory.RMISSLClientSocketFactory;
 
 public class GameWindow implements KeyListener, WindowListener {
 	private JFrame gameFrame;
@@ -23,8 +22,9 @@ public class GameWindow implements KeyListener, WindowListener {
 
 	private JFrame startFrame;
 
-	public ClientReader clientReader;
-	private SnakeSetDirInterface ssdi;
+	private SnakeControllerInterface snakeController;
+
+	private int index;
 
 	public GameWindow(JFrame startFrame) {
 		// game 프레임 생성
@@ -42,29 +42,32 @@ public class GameWindow implements KeyListener, WindowListener {
 		// start 프레임 지정
 		this.startFrame = startFrame;
 
-		// Reader, Sender 초기화
-		clientReader = null;
+		// snakeController 초기화
+		snakeController = null;
+
+		// id 초기화
+		index = -1;
 	}
 
-	public void startGame(Socket socket) {
+	public void startGame(String address) {
 		startFrame.setVisible(false);
 		gameFrame.setVisible(true);
 		gameFrame.requestFocus();
 
-		// ssdi 초기화
+		// snakeController 생성
 		try {
-			ssdi = (SnakeSetDirInterface) Naming.lookup("rmi://" + socket.getInetAddress().getHostAddress() + ":" + (Board.DEFAULT_PORT + 1) + "/" + Board.serverName);
-		} catch (MalformedURLException | RemoteException | NotBoundException e) {
+			Registry registry = LocateRegistry.getRegistry(InetAddress.getLocalHost().getHostName(), Board.DEFAULT_PORT, new RMISSLClientSocketFactory());
+			snakeController = (SnakeControllerInterface) registry.lookup(Board.snakeControllerName);
+		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		
-		clientReader = new ClientReader(socket, this, gameComponent);
-		new Thread(clientReader).start();
+			reset();
+        }
 	}
 
 	public void reset() {
-		// Reader 초기화
-		clientReader = null;
+		gameComponent.reset();
+
+		snakeController = null;
 
 		gameFrame.setVisible(false);
 		startFrame.setVisible(true);
@@ -76,23 +79,23 @@ public class GameWindow implements KeyListener, WindowListener {
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent keyEvent) {
 		try {
-			if (e.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed && clientReader.getId() != -1) {
-				ssdi.setDir(clientReader.getId(), 'R');
+			if (keyEvent.getKeyCode() == KeyEvent.VK_RIGHT && !gameComponent.keyPressed && index != -1) {
+				snakeController.setDir(index, 'R');
 				gameComponent.keyPressed = true;
-			} else if (e.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed && clientReader.getId() != -1) {
-				ssdi.setDir(clientReader.getId(), 'L');
+			} else if (keyEvent.getKeyCode() == KeyEvent.VK_LEFT && !gameComponent.keyPressed && index != -1) {
+				snakeController.setDir(index, 'L');
 				gameComponent.keyPressed = true;
-			} else if (e.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed && clientReader.getId() != -1) {
-				ssdi.setDir(clientReader.getId(), 'D');
+			} else if (keyEvent.getKeyCode() == KeyEvent.VK_DOWN && !gameComponent.keyPressed && index != -1) {
+				snakeController.setDir(index, 'D');
 				gameComponent.keyPressed = true;
-			} else if (e.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed && clientReader.getId() != -1) {
-				ssdi.setDir(clientReader.getId(), 'U');
+			} else if (keyEvent.getKeyCode() == KeyEvent.VK_UP && !gameComponent.keyPressed && index != -1) {
+				snakeController.setDir(index, 'U');
 				gameComponent.keyPressed = true;
 			}
-		} catch (RemoteException e1) {
-			e1.printStackTrace();
+		} catch (RemoteException remoteException) {
+			remoteException.printStackTrace();
 		}
 	}
 	public void keyTyped(KeyEvent e) {}
@@ -100,7 +103,7 @@ public class GameWindow implements KeyListener, WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		clientReader.threadStop();
+		reset();
 	}
 	public void windowClosed(WindowEvent e) {}
 	public void windowOpened(WindowEvent e) {}

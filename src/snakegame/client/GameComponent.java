@@ -24,6 +24,13 @@ public class GameComponent extends JComponent{
 		keyPressed = false;
 	}
 
+	public void reset(){
+		snakes = null;
+		apple = null;
+
+		keyPressed = false;
+	}
+
     public void paintGameComponents(ArrayList<Snake> snakes, Apple apple){
         this.snakes = snakes;
 		this.apple = apple;

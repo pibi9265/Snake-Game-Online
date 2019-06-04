@@ -1,11 +1,9 @@
 package snakegame.server;
 
-import java.net.Socket;
-import java.rmi.Naming;
 import java.net.InetAddress;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -15,38 +13,25 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import snakegame.element.Snake;
-import snakegame.element.SnakeSetDirImpl;
-import snakegame.element.SnakeSetDirInterface;
+import snakegame.element.SnakeControllerImpl;
 import snakegame.element.Part;
 import snakegame.element.Apple;
 import snakegame.element.Board;
 
+import snakegame.rmisslsocketfactory.RMISSLServerSocketFactory;
+import snakegame.rmisslsocketfactory.RMISSLClientSocketFactory;
+
 public class ServerWindow extends Thread {
-	public ArrayList<Socket> playerSockets;
 	private JFrame serverFrame;
-	public ArrayList<ObjectOutputStream> objectOutputStreams;
-	public ArrayList<ObjectInputStream> objectInputStreams;
+	private JLabel label;
 
 	public ArrayList<Snake> snakes;
 	public Apple apple;
-	public int curPlayer;
-
-	// private ServerAccepter serverAccepter;
 
 	private Random random;
-	public Boolean stop;
-
-	private int id;
-
-	private SnakeSetDirInterface ssdi;
 
 	public ServerWindow() {
 		try {
-			// socket, reader, sender 초기화
-			playerSockets = new ArrayList<Socket>();
-			objectOutputStreams = new ArrayList<ObjectOutputStream>();
-			objectInputStreams = new ArrayList<ObjectInputStream>();
-
 			// server 프레임 생성
 			serverFrame = new JFrame();
 			serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,28 +42,15 @@ public class ServerWindow extends Thread {
 			serverFrame.add(panel);
 			// address text area 생성 & panel에 추가
 			String addresString = new String("Hello, Snakes! [" + InetAddress.getLocalHost().getHostAddress() + "]");
-			JLabel label = new JLabel(addresString);
+			label = new JLabel(addresString);
 			panel.add(label);
 
 			// snake, apple 초기화
 			snakes = new ArrayList<Snake>();
 			apple = new Apple(Board.width / Board.grid - 2, Board.height / Board.grid - 2);
-			curPlayer = 0;
 
 			// 나머지 변수 초기화
 			random = new Random();
-			stop = false;
-			id = -1;
-
-			// rmi 변수 초기화
-			ssdi = new SnakeSetDirImpl(snakes);
-			try{
-				Naming.rebind("rmi://" + InetAddress.getLocalHost().getHostAddress() + ":" + (Board.DEFAULT_PORT + 1) + "/" + Board.serverName, ssdi);
-			} catch(IOException e){
-				e.printStackTrace();
-				label.setText("RMI Error");
-				stop = true;
-			}
 
 			// server 프레임 보이기 설정
 			serverFrame.setVisible(true);
@@ -90,83 +62,38 @@ public class ServerWindow extends Thread {
 		}
 	}
 
-	synchronized public void addPlayer(Socket player) throws IOException {
-		playerSockets.add(player);
-		objectOutputStreams.add(new ObjectOutputStream(player.getOutputStream()));
-		objectInputStreams.add(new ObjectInputStream(player.getInputStream()));
-		curPlayer++;
-		snakes.add(new Snake(1, 1));
-	}
-
-	synchronized public void delPlayer() {
+	public void start() {
 		try {
-			objectOutputStreams.get(id).close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			objectInputStreams.get(id).close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			playerSockets.get(id).close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		objectOutputStreams.remove(id);
-		objectInputStreams.remove(id);
-		playerSockets.remove(id);
-		snakes.remove(id);
-		curPlayer--;
-	}
-
-	public void run() {
-		while (!stop) {
-			try {
-				if (curPlayer > 0) {
-					for (id = 0; id < curPlayer; id++) {
-						objectOutputStreams.get(id).writeInt(id);
-						objectOutputStreams.get(id).writeInt(curPlayer);
-						for (int j = 0; j < curPlayer; j++) {
-							objectOutputStreams.get(id).writeObject(snakes.get(j));
+            Registry registry = LocateRegistry.createRegistry(Board.DEFAULT_PORT, new RMISSLClientSocketFactory(), new RMISSLServerSocketFactory());
+            SnakeControllerImpl snakeController = new SnakeControllerImpl(snakes, apple);
+			registry.bind(Board.snakeControllerName, snakeController);
+			while (true) {
+				try{
+					if (snakeController.getSize() > 0) {
+						for (int i = 0; i < snakeController.getSize(); i++) {
+							move(snakes.get(i));
+							shiftDir(snakes.get(i));
 						}
-						objectOutputStreams.get(id).writeObject(apple);
-						objectOutputStreams.get(id).reset();
-						if(id >= Board.maxPlayer){
-							delPlayer();
-						}
-					}
-					for (int i = 0; i < curPlayer; i++) {
-						move(snakes.get(i));
-						shiftDir(snakes.get(i));
-					}
-					for (int i = 0; i < curPlayer; i++) {
-						for (int j = 0; j < curPlayer; j++) {
-							if (i != j) {
-								collisionHB(snakes.get(i), snakes.get(j));
-								collisionHH(snakes.get(i), snakes.get(j));
+						for (int i = 0; i < snakeController.getSize(); i++) {
+							for (int j = 0; j < snakeController.getSize(); j++) {
+								if (i != j) {
+									collisionHB(snakes.get(i), snakes.get(j));
+									collisionHH(snakes.get(i), snakes.get(j));
+								}
 							}
 						}
+						collisionHA(snakes, apple);
 					}
-					collisionHA(snakes, apple);
-				}
-			} catch (IndexOutOfBoundsException e2) {
-				e2.printStackTrace();
-			} catch (NullPointerException e3) {
-				e3.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-				delPlayer();
-			} finally {
-				try {
-					id = -1;
 					Thread.sleep(Board.sleepTime);
-				} catch (InterruptedException e) {
+				} catch(Exception e){
 					e.printStackTrace();
 				}
 			}
-		}
+		} catch (Exception e) {
+			e.printStackTrace();
+			label.setText("RMI Error");
+			return;
+        }
 	}
 
   private void move(Snake snake) {
