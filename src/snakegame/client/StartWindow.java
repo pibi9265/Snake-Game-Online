@@ -36,6 +36,8 @@ public class StartWindow implements ActionListener {
         addressTextArea.setRows(Board.ipTextAreaRows);
         panel.add(addressTextArea);
 
+        System.setProperty("javax.net.ssl.trustStore", "clientstore");
+        System.setProperty("javax.net.ssl.trustStorePassword", "123456");
         // game 창 생성
         gameWindow = new GameWindow(startFrame);
 
