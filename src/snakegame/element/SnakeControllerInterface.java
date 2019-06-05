@@ -13,6 +13,7 @@ public interface SnakeControllerInterface extends Remote {
     public Apple getApple() throws RemoteException;
     public int getSize() throws RemoteException;
     public void setDir(int index, char dir) throws RemoteException;
-    public int addPlayer() throws RemoteException;
+    public int addPlayer(String playerName) throws RemoteException;
     public void removePlayer(int index) throws RemoteException;
+    public ArrayList<String> getPlayerNames() throws RemoteException;
 }

@@ -9,6 +9,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import javax.swing.JFrame;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import snakegame.client.GameComponent;
 import snakegame.element.Board;
@@ -31,16 +33,16 @@ public class GameWindow implements Runnable, KeyListener, WindowListener {
 	public GameWindow(JFrame startFrame) {
 		// game 프레임 생성
 		gameFrame = new JFrame();
-		gameFrame.setSize(Board.width + (Board.grid / 2), Board.height + (Board.grid * 2));
+		gameFrame.setSize(Board.width + (Board.grid / 2) + (Board.grid * 10), Board.height + (Board.grid / 2) + (Board.grid * 10));
 		gameFrame.setResizable(false);
 		// 프레임에 key 리스너 연결
 		gameFrame.addKeyListener(this);
 		// 프레임에 윈도우 리스너 연결
 		gameFrame.addWindowListener(this);
+		
 		// game component 생성 및 프레임에 추가
 		gameComponent = new GameComponent();
 		gameFrame.getContentPane().add(gameComponent);
-
 		// start 프레임 지정
 		this.startFrame = startFrame;
 
@@ -55,7 +57,7 @@ public class GameWindow implements Runnable, KeyListener, WindowListener {
 		stop = false;
 	}
 
-	public void startGame(String address) {
+	public void startGame(String address, String playerName) {
 		startFrame.setVisible(false);
 		gameFrame.setVisible(true);
 		gameFrame.requestFocus();
@@ -64,7 +66,7 @@ public class GameWindow implements Runnable, KeyListener, WindowListener {
 		try {
 			registry = LocateRegistry.getRegistry(address, Board.DEFAULT_PORT, new RMISSLClientSocketFactory());
 			snakeController = (SnakeControllerInterface) registry.lookup(Board.snakeControllerName);
-			id = snakeController.addPlayer();
+			id = snakeController.addPlayer(playerName);
 		} catch (Exception e) {
 			e.printStackTrace();
 			reset();
@@ -82,7 +84,7 @@ public class GameWindow implements Runnable, KeyListener, WindowListener {
 				e.printStackTrace();
 			}
 			try {
-				gameComponent.paintGameComponents(id, snakeController.getSnakes(), snakeController.getApple());
+				gameComponent.paintGameComponents(id, snakeController.getSnakes(), snakeController.getApple(), snakeController.getPlayerNames());
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -149,7 +151,27 @@ public class GameWindow implements Runnable, KeyListener, WindowListener {
 		startFrame.setVisible(true);
 		startFrame.requestFocus();
 	}
-	public void windowClosed(WindowEvent e) {}
+	public void windowClosed(WindowEvent e) {
+		threadStop();
+		try {
+			Thread.sleep(Board.sleepTime / 10);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+		try {
+			snakeController.removePlayer(id);
+		} catch (RemoteException remoteException) {
+			remoteException.printStackTrace();
+		}
+
+		gameComponent.reset();
+		reset();
+
+		gameFrame.setVisible(false);
+		startFrame.setVisible(true);
+		startFrame.requestFocus();
+	}
 	public void windowOpened(WindowEvent e) {}
 	public void windowIconified(WindowEvent e) {}
 	public void windowDeiconified(WindowEvent e) {}

@@ -14,10 +14,13 @@ import snakegame.client.GameWindow;
 public class StartWindow implements ActionListener {
     private JFrame startFrame;
     private JTextArea addressTextArea;
-
+    private JTextArea playerNameTextArea;
     private GameWindow gameWindow;
 
     public StartWindow() {
+    	//property 설정
+    	System.setProperty("javax.net.ssl.trustStore", "./clientstore");
+        System.setProperty("javax.net.ssl.trustStorePassword", "123456");
         // start 프레임 생성
         startFrame = new JFrame();
         startFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,9 +38,12 @@ public class StartWindow implements ActionListener {
         addressTextArea.setColumns(Board.ipTextAreaColumns);
         addressTextArea.setRows(Board.ipTextAreaRows);
         panel.add(addressTextArea);
-
-        System.setProperty("javax.net.ssl.trustStore", "clientstore");
-        System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+        
+        playerNameTextArea = new JTextArea("Enter your username");
+        playerNameTextArea.setColumns(Board.ipTextAreaColumns);
+        playerNameTextArea.setRows(Board.ipTextAreaRows);
+        panel.add(playerNameTextArea);
+        
         // game 창 생성
         gameWindow = new GameWindow(startFrame);
 
@@ -52,6 +58,6 @@ public class StartWindow implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        gameWindow.startGame(addressTextArea.getText());
+        gameWindow.startGame(addressTextArea.getText(), playerNameTextArea.getText());
     }
 }

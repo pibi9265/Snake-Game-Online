@@ -18,8 +18,9 @@ public class SnakeControllerImpl extends UnicastRemoteObject implements SnakeCon
 	private static final long serialVersionUID = 1L;
 
 	private ArrayList<Snake> snakes;
+	private ArrayList<String> playerNames;
 	private Apple apple;
-
+	
 	private int size;
 
 	private int[] idList = new int[Board.maxPlayer];
@@ -29,11 +30,13 @@ public class SnakeControllerImpl extends UnicastRemoteObject implements SnakeCon
 
 		this.snakes = snakes;
 		this.apple = apple;
-
+		playerNames = new ArrayList<String>();
+		
 		size = 0;
 
 		for(int i = 0; i < Board.maxPlayer; i++){
 			idList[i] = 0;
+			playerNames.add(null);
 		}
 	}
 
@@ -41,7 +44,7 @@ public class SnakeControllerImpl extends UnicastRemoteObject implements SnakeCon
 	public Snake getSnake(int index) {
 		return snakes.get(index);
 	}
-
+	
 	@Override
 	public ArrayList<Snake> getSnakes() throws RemoteException {
 		return snakes;
@@ -57,6 +60,10 @@ public class SnakeControllerImpl extends UnicastRemoteObject implements SnakeCon
 		return size;
 	}
 
+	public ArrayList<String> getPlayerNames() throws RemoteException {
+		return playerNames;
+	}
+	
 	@Override
 	public void setDir(int id, char dir) {
 		int index = -1;
@@ -99,7 +106,7 @@ public class SnakeControllerImpl extends UnicastRemoteObject implements SnakeCon
 	}
 
 	@Override
-	public int addPlayer() throws RemoteException {
+	public int addPlayer(String playerName) throws RemoteException {
 		if(size < Board.maxPlayer){
 			for(int i = 0; i < Board.maxPlayer; i++){
 				if(idList[i] == 0){
@@ -107,6 +114,7 @@ public class SnakeControllerImpl extends UnicastRemoteObject implements SnakeCon
 					size++;
 					snakes.add(new Snake(1, 1));
 					snakes.get(snakes.size()-1).id = i;
+					playerNames.set(i, playerName);
 					
 					if(i==0){
 						snakes.get(snakes.size()-1).r = 255;
@@ -146,6 +154,7 @@ public class SnakeControllerImpl extends UnicastRemoteObject implements SnakeCon
 		for(int i = 0; i < size; i++){
 			if(snakes.get(i).id == id){
 				snakes.remove(i);
+				playerNames.set(id, null);
 				size--;
 				idList[id] = 0;
 			}
