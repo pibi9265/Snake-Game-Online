@@ -28,10 +28,10 @@ option 2
 [jar 파일 만들기 (실행파일)]
   step1 (server.jar 만들기)
     "bin" 폴더로 이동, 아래 커맨드 입력
-      jar -cvfm server.jar ..\META-INF\server_manifest.mf .\snakegame\server .\snakegame\element .\snakegame\rmisslsocketfactory .\serverkeystore
+      jar -cvfm server.jar ..\META-INF\server_manifest.mf .\snakegame\server .\snakegame\element .\snakegame\rmisslsocketfactory
   step2 (client.jar 만들기)
     "bin" 폴더에서 아래 커맨드 입력
-      jar -cvfm client.jar ..\META-INF\client_manifest.mf .\snakegame\client .\snakegame\element .\snakegame\rmisslsocketfactory .\clientkeystore
+      jar -cvfm client.jar ..\META-INF\client_manifest.mf .\snakegame\client .\snakegame\element .\snakegame\rmisslsocketfactory
 
 option 3
 [java 환경변수 설정]
