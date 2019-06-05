@@ -21,7 +21,7 @@ start rmiregistry
 // 실행
 // bin폴더에서
 java snakegame.server.ServerDo
-java -Djavax.net.ssl.trustStore=.\clientstore -Djavax.net.ssl.trustStorePassword=123456 snakegame.client.ClientDo
+java snakegame.client.ClientDo
 
 // jar 파일 만들기 (실행파일)
 // bin폴더에서

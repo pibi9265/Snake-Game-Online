@@ -149,7 +149,27 @@ public class GameWindow implements Runnable, KeyListener, WindowListener {
 		startFrame.setVisible(true);
 		startFrame.requestFocus();
 	}
-	public void windowClosed(WindowEvent e) {}
+	public void windowClosed(WindowEvent e) {
+		threadStop();
+		try {
+			Thread.sleep(Board.sleepTime / 10);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+		try {
+			snakeController.removePlayer(id);
+		} catch (RemoteException remoteException) {
+			remoteException.printStackTrace();
+		}
+
+		gameComponent.reset();
+		reset();
+
+		gameFrame.setVisible(false);
+		startFrame.setVisible(true);
+		startFrame.requestFocus();
+	}
 	public void windowOpened(WindowEvent e) {}
 	public void windowIconified(WindowEvent e) {}
 	public void windowDeiconified(WindowEvent e) {}
