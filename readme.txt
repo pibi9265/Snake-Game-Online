@@ -1,14 +1,14 @@
 ﻿// ssl keystore 및 key 생성 (이미 만들어 놓음, 비번 123456)
 // bin폴더에서
-keytool -genkey -keystore .\serverstore -keyalg RSA -storetype JKS
+keytool -genkey -keystore .\serverkeystore -keyalg RSA -storetype JKS
 
 // keystore에서 인증서 export하기 (이미 만들어 놓음, 비번 123456)
 // bin폴더에서
-keytool -export -keystore serverstore -file certification.cer
+keytool -export -keystore serverkeystore -file certification.cer
 
 // client에서 keystore 생성하고 keystore애 인증서 import하기 (이미 만들어 놓음, 비번 123456)
 // bin폴더에서
-keytool -import -keystore .\clientstore -file certification.cer
+keytool -import -keystore .\clientkeystore -file certification.cer
 
 // 컴파일
 // src폴더에서
@@ -25,8 +25,8 @@ java snakegame.client.ClientDo
 
 // jar 파일 만들기 (실행파일)
 // bin폴더에서
-jar -cvfm server.jar ..\META-INF\server_manifest.mf .\snakegame\server .\snakegame\element .\snakegame\rmisslsocketfactory
-jar -cvfm client.jar ..\META-INF\client_manifest.mf .\snakegame\client .\snakegame\element .\snakegame\rmisslsocketfactory
+jar -cvfm server.jar ..\META-INF\server_manifest.mf .\snakegame\server .\snakegame\element .\snakegame\rmisslsocketfactory .\serverkeystore
+jar -cvfm client.jar ..\META-INF\client_manifest.mf .\snakegame\client .\snakegame\element .\snakegame\rmisslsocketfactory .\clientkeystore
 
 // java 환경변수
 ////////////////////////////////////////

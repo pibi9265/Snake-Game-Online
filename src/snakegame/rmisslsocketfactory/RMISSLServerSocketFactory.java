@@ -22,7 +22,7 @@ public class RMISSLServerSocketFactory implements RMIServerSocketFactory {
 
             char[] passphrase = "123456".toCharArray();
             ks = KeyStore.getInstance("JKS");
-            ks.load(new FileInputStream("./serverstore"), passphrase);
+            ks.load(new FileInputStream("./serverkeystore"), passphrase);
 
             kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(ks, passphrase);

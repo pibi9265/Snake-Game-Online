@@ -143,11 +143,13 @@ public class SnakeControllerImpl extends UnicastRemoteObject implements SnakeCon
 
 	@Override
 	public void removePlayer(int id) throws RemoteException {
-		for(int i = 0; i < size; i++){
-			if(snakes.get(i).id == id){
-				snakes.remove(i);
-				size--;
-				idList[id] = 0;
+		if(id != -1){
+			for(int i = 0; i < size; i++){
+				if(snakes.get(i).id == id){
+					snakes.remove(i);
+					size--;
+					idList[id] = 0;
+				}
 			}
 		}
 	}

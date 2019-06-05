@@ -19,7 +19,7 @@ public class StartWindow implements ActionListener {
 
     public StartWindow() {
         // property 설정
-        System.setProperty("javax.net.ssl.trustStore", "./clientstore");
+        System.setProperty("javax.net.ssl.trustStore", "./clientkeystore");
         System.setProperty("javax.net.ssl.trustStorePassword", "123456");
 
         // start 프레임 생성
