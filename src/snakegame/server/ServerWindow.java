@@ -41,7 +41,7 @@ public class ServerWindow extends Thread {
 			JPanel panel = new JPanel();
 			serverFrame.add(panel);
 			// address text area 생성 & panel에 추가
-			String addresString = new String("Hello, Snakes! [" + InetAddress.getLocalHost().getHostName() + "]");
+			String addresString = new String("Hello, Snakes! [" + InetAddress.getLocalHost().getHostAddress() + "]");
 			label = new JLabel(addresString);
 			panel.add(label);
 
