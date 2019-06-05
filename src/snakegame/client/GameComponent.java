@@ -16,7 +16,7 @@ public class GameComponent extends JComponent{
 	
 	private int id;
 
-    private ArrayList<Snake> snakes;
+  private ArrayList<Snake> snakes;
 	private Apple apple;
 	private ArrayList<String> playerNames;
 	

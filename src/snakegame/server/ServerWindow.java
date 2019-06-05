@@ -64,8 +64,8 @@ public class ServerWindow extends Thread {
 
 	public void start() {
 		try {
-            Registry registry = LocateRegistry.createRegistry(Board.DEFAULT_PORT, new RMISSLClientSocketFactory(), new RMISSLServerSocketFactory());
-            SnakeControllerImpl snakeController = new SnakeControllerImpl(snakes, apple);
+      Registry registry = LocateRegistry.createRegistry(Board.DEFAULT_PORT, new RMISSLClientSocketFactory(), new RMISSLServerSocketFactory());
+      SnakeControllerImpl snakeController = new SnakeControllerImpl(snakes, apple);
 			registry.bind(Board.snakeControllerName, snakeController);
 			while (true) {
 				try{
@@ -78,7 +78,7 @@ public class ServerWindow extends Thread {
 							for (int j = 0; j < snakeController.getSize(); j++) {
 								if (i != j) {
 									collisionHH(snakes.get(i), snakes.get(j));
-								}		
+								}
 								collisionHB(snakes.get(i), snakes.get(j));
 							}
 						}
@@ -93,7 +93,7 @@ public class ServerWindow extends Thread {
 			e.printStackTrace();
 			label.setText("RMI Error");
 			return;
-        }
+    }
 	}
 
 	public JFrame getFrame() {

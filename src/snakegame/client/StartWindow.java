@@ -18,9 +18,10 @@ public class StartWindow implements ActionListener {
     private GameWindow gameWindow;
 
     public StartWindow() {
-    	//property 설정
-    	System.setProperty("javax.net.ssl.trustStore", "./clientstore");
+        // property 설정
+        System.setProperty("javax.net.ssl.trustStore", "clientkeystore");
         System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+
         // start 프레임 생성
         startFrame = new JFrame();
         startFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,7 +44,7 @@ public class StartWindow implements ActionListener {
         playerNameTextArea.setColumns(Board.ipTextAreaColumns);
         playerNameTextArea.setRows(Board.ipTextAreaRows);
         panel.add(playerNameTextArea);
-        
+
         // game 창 생성
         gameWindow = new GameWindow(startFrame);
 
