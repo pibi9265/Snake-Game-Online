@@ -31,29 +31,29 @@ public class GameWindow implements Runnable, KeyListener, WindowListener {
 	private boolean stop;
 
 	public GameWindow(JFrame startFrame) {
-		// game �봽�젅�엫 �깮�꽦
+		// game 프레임 생성
 		gameFrame = new JFrame();
 		gameFrame.setSize(Board.width + (Board.grid / 2) + (Board.grid * 10), Board.height + (Board.grid * 2));
 		gameFrame.setResizable(false);
-		// �봽�젅�엫�뿉 key 由ъ뒪�꼫 �뿰寃�
+		// 프레임에 key 리스너 연결
 		gameFrame.addKeyListener(this);
-		// �봽�젅�엫�뿉 �쐢�룄�슦 由ъ뒪�꼫 �뿰寃�
+		// 프레임에 윈도우 리스너 연결
 		gameFrame.addWindowListener(this);
-		
-		// game component �깮�꽦 諛� �봽�젅�엫�뿉 異붽�
+		// game component 생성 및 프레임에 추가
 		gameComponent = new GameComponent();
 		gameFrame.getContentPane().add(gameComponent);
-		// start �봽�젅�엫 吏��젙
+
+		// start 프레임 지정
 		this.startFrame = startFrame;
 
-		// snakeController 珥덇린�솕
+		// snakeController 초기화
 		registry = null;
 		snakeController = null;
 
-		// id 珥덇린�솕
+		// id 초기화
 		id = -1;
 
-		// stop 珥덇린�솕
+		// stop 초기화
 		stop = false;
 	}
 
@@ -62,7 +62,7 @@ public class GameWindow implements Runnable, KeyListener, WindowListener {
 		gameFrame.setVisible(true);
 		gameFrame.requestFocus();
 
-		// snakeController �깮�꽦
+		// snakeController 생성
 		try {
 			registry = LocateRegistry.getRegistry(address, Board.DEFAULT_PORT, new RMISSLClientSocketFactory());
 			snakeController = (SnakeControllerInterface) registry.lookup(Board.snakeControllerName);
